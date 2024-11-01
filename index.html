@@ -1,1 +1,202 @@
-test
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="apple-itunes-app" content="app-id=6532621812, app-argument=myURL">
+    <meta name="description" content="GyroHero is the ultimate gyroscope challenge for iOS devices. Test your reflexes with voice and gyroscope commands in this fun and engaging mobile game. Perfect for all ages.">
+    <meta name="keywords" content="GyroHero, gyroscope game, mobile game, reflex game, voice commands, reaction game">
+
+<meta property="og:title" content="GyroHero - The Ultimate Gyroscope Challenge">
+<meta property="og:description" content="Tilt, turn, and shake your way through GyroHero, the ultimate reflex and coordination game. Available on the App Store.">
+<meta property="og:image" content="https://github.com/gyroherosupport/gyroherosupport.github.io/blob/1fa61b356221cbfdfd68f5be728ac95e65777db6/game_logo.png?raw=true">
+<meta property="og:url" content="https://gyroherosupport.github.io/">
+<meta property="og:type" content="website">
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="GyroHero - The Ultimate Gyroscope Challenge">
+<meta name="twitter:description" content="Tilt, turn, and shake your way through GyroHero, the ultimate reflex and coordination game. Available on the App Store.">
+<meta name="twitter:image" content="https://github.com/gyroherosupport/gyroherosupport.github.io/blob/1fa61b356221cbfdfd68f5be728ac95e65777db6/game_logo.png?raw=true">
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "MobileApplication",
+  "name": "GyroHero",
+  "operatingSystem": "iOS",
+  "applicationCategory": "Game",
+  "description": "GyroHero is the ultimate gyroscope challenge. Test your reflexes with voice and gyroscope commands in this fun and engaging mobile game.",
+  "offers": {
+    "@type": "Offer",
+    "price": "0.00",
+    "priceCurrency": "USD"
+  },
+  "url": "https://apps.apple.com/app/gyrohero/id6532621812",
+  "aggregateRating": {
+    "@type": "AggregateRating",
+    "ratingValue": "5.0",
+    "ratingCount": "1"  // Replace 123 with the actual number of ratings
+  },
+  "image": "https://github.com/gyroherosupport/gyroherosupport.github.io/blob/1fa61b356221cbfdfd68f5be728ac95e65777db6/game_logo.png?raw=true"
+}
+</script>
+
+
+    <meta name="google-site-verification" content="0swdZvoubuDnZFF7bI5Bns04uNQRdYmVr8y6nYr9w9M" />
+    
+    <title>GyroHero - The Ultimate Gyroscope Challenge</title>
+    <link href="https://fonts.googleapis.com/css2?family=Lora:wght@700&family=Montserrat:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Montserrat', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            text-align: center;
+            overflow-y: auto; /* Allow vertical scrolling */
+            overflow-x: hidden; /* Prevent horizontal scrolling */
+        }
+        .container {
+            max-width: 600px;
+            padding: 10px;
+            background-color: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            margin: 10px; /* Ensure the container is centered even when scrollable */
+        }
+        .game-logo {
+            width: 100px;
+            height: 100px;
+            margin-bottom: 10px;
+            border-radius: 22% / 22%; /* Rounded corners, similar to Apple style */
+            overflow: hidden;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        h1 {
+            font-family: 'Lora', serif;
+            font-size: 2.5em;
+            margin: 10px 0 5px 0; /* Adjust margins to bring the subtitle closer */
+            color: #333;
+        }
+        h2 {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1.2em;
+            margin-bottom: 20px;
+            color: #777;
+            font-weight: 600;
+            margin-top: 5px; /* Bring closer to the title */
+        }
+        p {
+            font-size: 1em;
+            line-height: 1.6;
+            margin: 20px 0;
+            color: #555;
+        }
+        .features-list {
+            text-align: left;
+            margin: 20px 0;
+        }
+        .features-list li {
+            margin-bottom: 10px;
+            font-size: 1em;
+            line-height: 1.4;
+        }
+        .download-section {
+            margin: 30px 0 20px;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            align-items: center;
+        }
+        .download-section a {
+            text-decoration: none;
+            display: inline-block;
+        }
+        .download-section img {
+            height: 54px;
+            filter: drop-shadow(0px 4px 10px rgba(0, 0, 0, 0.2));
+        }
+        nav {
+            margin-top: 20px;
+        }
+        nav a {
+            color: #888;
+            text-decoration: none;
+            margin: 0 10px;
+            font-size: 0.9em;
+            transition: color 0.3s ease;
+        }
+        nav a:hover {
+            color: #FF6F61;
+        }
+
+        /* Responsive styles */
+        @media screen and (max-width: 600px) {
+            h1 {
+                font-size: 2.2em;
+            }
+            h2 {
+                font-size: 1em;
+            }
+            p {
+                font-size: 0.9em;
+            }
+            .container {
+                padding: 20px;
+                margin: 10px; /* Adjust margins to ensure space for scrolling */
+            }
+            .download-section {
+                flex-direction: column;
+                gap: 15px;
+            }
+            .download-section img {
+                width: 140px;
+                height: auto;
+            }
+        }
+    </style>
+
+<script type="text/javascript">
+!function(){"use strict";!function(e,t){var r=e.amplitude||{_q:[],_iq:{}};if(r.invoked)e.console&&console.error&&console.error("Amplitude snippet has been loaded.");else{var n=function(e,t){e.prototype[t]=function(){return this._q.push({name:t,args:Array.prototype.slice.call(arguments,0)}),this}},s=function(e,t,r){return function(n){e._q.push({name:t,args:Array.prototype.slice.call(r,0),resolve:n})}},o=function(e,t,r){e._q.push({name:t,args:Array.prototype.slice.call(r,0)})},i=function(e,t,r){e[t]=function(){if(r)return{promise:new Promise(s(e,t,Array.prototype.slice.call(arguments)))};o(e,t,Array.prototype.slice.call(arguments))}},a=function(e){for(var t=0;t<g.length;t++)i(e,g[t],!1);for(var r=0;r<m.length;r++)i(e,m[r],!0)};r.invoked=!0;var c=t.createElement("script");c.type="text/javascript",c.integrity="sha384-pY2pkwHaLM/6UIseFHVU3hOKr6oAvhLcdYkoRZyaMDWLjpM6B7nTxtOdE823WAOQ",c.crossOrigin="anonymous",c.async=!0,c.src="https://cdn.amplitude.com/libs/analytics-browser-2.11.0-min.js.gz",c.onload=function(){e.amplitude.runQueuedFunctions||console.log("[Amplitude] Error: could not load SDK")};var u=t.getElementsByTagName("script")[0];u.parentNode.insertBefore(c,u);for(var p=function(){return this._q=[],this},l=["add","append","clearAll","prepend","set","setOnce","unset","preInsert","postInsert","remove","getUserProperties"],d=0;d<l.length;d++)n(p,l[d]);r.Identify=p;for(var f=function(){return this._q=[],this},v=["getEventProperties","setProductId","setQuantity","setPrice","setRevenue","setRevenueType","setEventProperties"],y=0;y<v.length;y++)n(f,v[y]);r.Revenue=f;var g=["getDeviceId","setDeviceId","getSessionId","setSessionId","getUserId","setUserId","setOptOut","setTransport","reset","extendSession"],m=["init","add","remove","track","logEvent","identify","groupIdentify","setGroup","revenue","flush"];a(r),r.createInstance=function(e){return r._iq[e]={_q:[]},a(r._iq[e]),r._iq[e]},e.amplitude=r}}(window,document)}();
+
+amplitude.init('fd3bfb8315062b9901539a7ce84ba1da');
+</script>
+    
+</head>
+<body>
+    <div class="container">
+        <img src="game_logo.png" alt="GyroHero Logo" class="game-logo">
+        <h1>CityRank</h1>
+        <h2>Discover, Rate, and Explore Cities Like Never Before</h2>
+        <p>Test your reflexes and coordination with Gyro Hero, the game that challenges you to tilt, turn, and shake your way through a series of commands. With intuitive controls and simple yet engaging gameplay, Gyro Hero is perfect for players of all ages.</p>
+        
+        <ul class="features-list">
+            <li><strong>Voice and Gyroscope Commands:</strong> Use voice commands and gyroscope controls for an interactive and immersive experience.</li>
+            <li><strong>Player Analytics:</strong> Track your performance with detailed analytics, helping you understand and improve your game.</li>
+            <li><strong>Simple and Clean Graphics:</strong> Enjoy a visually straightforward and user-friendly interface.</li>
+            <li><strong>High Score Tracking:</strong> Keep an eye on your personal best scores and strive to beat them.</li>
+        </ul>
+        
+        <div class="download-section">
+            <a href="https://apps.apple.com/app/gyrohero/id6532621812">
+                <img src="https://developer.apple.com/assets/elements/badges/download-on-the-app-store.svg" alt="Download on the App Store">
+            </a>
+            <a href="https://www.producthunt.com/posts/gyrohero?embed=true&utm_source=badge-featured&utm_medium=badge&utm_souce=badge-gyrohero" target="_blank">
+                <img src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=482577&theme=light" alt="GyroHero on Product Hunt">
+            </a>
+        </div>
+
+        <nav>
+            <a href="terms.html">Terms of Use</a> | 
+            <a href="privacy.html">Privacy Policy</a>
+        </nav>
+    </div>
+</body>
+</html>
