@@ -195,14 +195,14 @@
                     const averageRating = countryRatings[countryName].totalRating / countryRatings[countryName].count;
                     addPolygonForCountry(countryName, averageRating);
                 });
-            }, 1); // Delay to ensure all city coordinates are processed
+            }, 3000); // Delay to ensure all city coordinates are processed
         }).catch(error => {
             console.error('CloudKit query failed:', error);
         });
 
         // Geocode city name to coordinates
         function geocodeCity(cityName) {
-            return fetch(https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(cityName)}.json?access_token=${mapboxgl.accessToken})
+            return fetch(`https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(cityName)}.json?access_token=${mapboxgl.accessToken}`)
                 .then(response => response.json())
                 .then(data => {
                     if (data.features && data.features.length > 0) {
@@ -219,7 +219,7 @@
 
             // Create a GeoJSON source and add it as a layer
             map.addLayer({
-                id: ${city.cityName}-circle,
+                id: `${city.cityName}-circle`,
                 type: 'circle',
                 source: {
                     type: 'geojson',
@@ -244,8 +244,8 @@
             });
 
             // Add a click event for each city circle
-            map.on('click', ${city.cityName}-circle, (e) => {
-                const features = map.queryRenderedFeatures(e.point, { layers: [${city.cityName}-circle] });
+            map.on('click', `${city.cityName}-circle`, (e) => {
+                const features = map.queryRenderedFeatures(e.point, { layers: [`${city.cityName}-circle`] });
                 if (features.length) {
                     const cityName = features[0].properties.cityName;
                     const rating = features[0].properties.rating;
@@ -254,11 +254,11 @@
                     // Display city details in a popup
                     new mapboxgl.Popup()
                         .setLngLat(coordinate)
-                        .setHTML(
+                        .setHTML(`
                             <strong>City:</strong> ${cityName}<br>
                             <strong>Rating:</strong> ${rating}<br>
                             <strong>Comment:</strong> ${comment || 'No comment'}
-                        )
+                        `)
                         .addTo(map);
                 }
             });
@@ -267,8 +267,8 @@
         function addPolygonForCountry(countryName, rating) {
             const color = ratingColors[Math.round(rating)] || '#3498db';
 
-            const sourceId = ${countryName}-boundary-source;
-            const layerId = ${countryName}-boundary-layer;
+            const sourceId = `${countryName}-boundary-source`;
+            const layerId = `${countryName}-boundary-layer`;
 
             // Remove existing source or layer if they exist
             if (map.getLayer(layerId)) {
