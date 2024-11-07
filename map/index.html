@@ -264,38 +264,44 @@
             });
         }
 
-        function addPolygonForCountry(countryName, rating) {
-            const color = ratingColors[Math.round(rating)] || '#3498db';
+function addPolygonForCountry(countryName, rating) {
+    // Treat "Czech Republic" as "Czechia"
+    if (countryName === "Czech Republic") {
+        countryName = "Czechia";
+    }
 
-            const sourceId = `${countryName}-boundary-source`;
-            const layerId = `${countryName}-boundary-layer`;
+    const color = ratingColors[Math.round(rating)] || '#3498db';
 
-            // Remove existing source or layer if they exist
-            if (map.getLayer(layerId)) {
-                map.removeLayer(layerId);
-            }
+    const sourceId = `${countryName}-boundary-source`;
+    const layerId = `${countryName}-boundary-layer`;
 
-            if (map.getSource(sourceId)) {
-                map.removeSource(sourceId);
-            }
+    // Remove existing source or layer if they exist
+    if (map.getLayer(layerId)) {
+        map.removeLayer(layerId);
+    }
 
-            map.addSource(sourceId, {
-                type: 'vector',
-                url: 'mapbox://mapbox.country-boundaries-v1'
-            });
+    if (map.getSource(sourceId)) {
+        map.removeSource(sourceId);
+    }
 
-            map.addLayer({
-                id: layerId,
-                type: 'fill',
-                source: sourceId,
-                'source-layer': 'country_boundaries',
-                paint: {
-                    'fill-color': color,
-                    'fill-opacity': 0.7
-                },
-                filter: ['==', 'name_en', countryName]
-            });
-        }
+    map.addSource(sourceId, {
+        type: 'vector',
+        url: 'mapbox://mapbox.country-boundaries-v1'
+    });
+
+    map.addLayer({
+        id: layerId,
+        type: 'fill',
+        source: sourceId,
+        'source-layer': 'country_boundaries',
+        paint: {
+            'fill-color': color,
+            'fill-opacity': 0.7
+        },
+        filter: ['==', 'name_en', countryName]
+    });
+}
+
     </script>
 </body>
 </html>
