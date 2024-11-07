@@ -225,6 +225,9 @@
                     'circle-radius': 20,
                     'circle-color': color,
                     'circle-opacity': 0.7
+                },
+                layout: {
+                    'visibility': map.getZoom() > 4.0 ? 'visible' : 'none'
                 }
             });
 
@@ -279,7 +282,7 @@
                     'fill-opacity': 0.7
                 },
                 layout: {
-                    'visibility': map.getZoom() <= 2.0 ? 'visible' : 'none'
+                    'visibility': map.getZoom() <= 4.0 ? 'visible' : 'none'
                 },
                 filter: ['==', 'name_en', countryName]
             });
@@ -288,11 +291,16 @@
         // Toggle visibility based on zoom level
         map.on('zoom', () => {
             const currentZoom = map.getZoom();
-            const visibility = currentZoom <= 4.0 ? 'visible' : 'none';
+            const countryVisibility = currentZoom <= 4.0 ? 'visible' : 'none';
+            const cityVisibility = currentZoom > 4.0 ? 'visible' : 'none';
 
+            // Set visibility for country polygons
             map.getStyle().layers.forEach(layer => {
                 if (layer.id.includes('-boundary-layer')) {
-                    map.setLayoutProperty(layer.id, 'visibility', visibility);
+                    map.setLayoutProperty(layer.id, 'visibility', countryVisibility);
+                }
+                if (layer.id.includes('-circle')) {
+                    map.setLayoutProperty(layer.id, 'visibility', cityVisibility);
                 }
             });
         });
