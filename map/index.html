@@ -42,6 +42,19 @@
             projection: 'globe'
         });
 
+                // Add Navigation Control
+        const navControl = new mapboxgl.NavigationControl();
+        map.addControl(navControl, 'top-right'); // Position the navigation control at the top-right corner
+
+        // Add Geolocation Control
+        const geoLocateControl = new mapboxgl.GeolocateControl({
+            positionOptions: { enableHighAccuracy: true },
+            trackUserLocation: true,
+            showUserHeading: true
+        });
+        map.addControl(geoLocateControl, 'top-left'); // Position the geolocation control at the top-left corner
+
+
         // Apply globe settings, atmosphere, and adjust appearance of layers
         map.on('style.load', () => {
             map.setFog({
