@@ -12,22 +12,23 @@ mapboxgl.accessToken = 'pk.eyJ1IjoibWlraXRrbzEiLCJhIjoiY20wemJxaDVzMDVheDJqczg0N
 const map = new mapboxgl.Map({
     container: 'map',
     style: 'mapbox://styles/mapbox/streets-v11',
-    center: [0, 0],
-    zoom: 2,
-    projection: 'globe' 
+    center: [-3.7038, 40.4168], // Center on Spain for testing
+    zoom: 5,
+    projection: 'globe'
 });
 
-// Sample country color mapping for testing
-const countryRatingColors = {
-    "US": '#2ecc71',  // Green for the United States
-    "CA": '#3498db',  // Blue for Canada
-    "ES": '#e74c3c'   // Red for Mexico
+// Define rating colors
+const ratingColors = {
+    5: '#2ecc71', // Bright green
+    4: '#27ae60', // Green
+    3: '#f1c40f', // Yellow
+    2: '#e67e22', // Orange
+    1: '#e74c3c'  // Red
 };
 
+// Calculate average rating and apply to country polygons
 map.on('style.load', () => {
     console.log("Map style loaded successfully.");
-
-    // Apply atmospheric effect for visual quality
     map.setFog({
         color: 'rgba(135, 206, 235, 0.5)',
         "high-color": 'rgba(70, 130, 180, 0.8)',
@@ -35,43 +36,80 @@ map.on('style.load', () => {
         "horizon-blend": 0.1,
         "star-intensity": 0.1
     });
-
-    // Add the country boundaries with dynamic colors
-    addCountryBoundariesWithColors();
+    
+    // Fetch ratings for countries
+    fetchCountryRatings();
 });
 
-function addCountryBoundariesWithColors() {
-    const sourceId = "country-boundaries";
-    const layerId = "country-boundaries-layer";
+function fetchCountryRatings() {
+    console.log("Fetching country ratings from CloudKit.");
+    CloudKit.getDefaultContainer().publicCloudDatabase.performQuery({
+        recordType: 'CityComment'
+    }).then(response => {
+        if (response.hasErrors) {
+            console.error('CloudKit query failed:', response.errors);
+            return;
+        }
+        
+        const countryRatings = {};
+        response.records.forEach(record => {
+            const country = record.fields.country?.value;
+            const rating = record.fields.rating?.value;
+            if (country && rating) {
+                if (!countryRatings[country]) countryRatings[country] = [];
+                countryRatings[country].push(rating);
+            }
+        });
+
+        // Calculate average ratings for each country
+        Object.keys(countryRatings).forEach(country => {
+            const avgRating = calculateAverage(countryRatings[country]);
+            const roundedRating = Math.round(avgRating);
+            addCountryPolygon(country, roundedRating);
+        });
+    }).catch(error => console.error('CloudKit query failed:', error));
+}
+
+// Calculate the average of an array
+function calculateAverage(ratings) {
+    return ratings.reduce((a, b) => a + b, 0) / ratings.length;
+}
+
+// Add polygon for a country based on calculated rating
+function addCountryPolygon(country, rating) {
+    const color = ratingColors[rating] || '#3498db';  // Default to blue if no rating
+    const countryCodeMap = { 'Spain': 'ES' };  // Add Spain as a test case
+
+    if (!countryCodeMap[country]) return;  // Only add polygons for defined countries (e.g., Spain)
+
+    const isoCode = countryCodeMap[country];  // Get ISO code for filtering
+
+    // Define the fill layer
+    const sourceId = `${isoCode}-source`;
+    const layerId = `${isoCode}-layer`;
 
     // Remove existing source and layer if they exist
     if (map.getSource(sourceId)) map.removeSource(sourceId);
     if (map.getLayer(layerId)) map.removeLayer(layerId);
 
-    // Add the Mapbox vector source
+    // Add Mapbox vector source for country boundaries
     map.addSource(sourceId, {
         type: 'vector',
         url: 'mapbox://mapbox.country-boundaries-v1'
     });
 
-    // Define the fill layer with a filter for the United States
+    // Add polygon layer with color based on rating
     map.addLayer({
         id: layerId,
         type: 'fill',
         source: sourceId,
         'source-layer': 'country_boundaries',
+        filter: ['==', 'iso_3166_1_alpha_2', isoCode],
         paint: {
-            'fill-color': [
-                'match',
-                ['get', 'iso_3166_1_alpha_2'],
-                'US', countryRatingColors['US'] || '#cccccc',
-                'CA', countryRatingColors['CA'] || '#cccccc',
-                'MX', countryRatingColors['MX'] || '#cccccc',
-                '#cccccc' // Default color for countries without specified color
-            ],
+            'fill-color': color,
             'fill-opacity': 0.5
         }
     });
 
-    console.log("Country boundaries layer with dynamic colors added successfully.");
+    console.log(`Added polygon for ${country} with color ${color}`);
 }
