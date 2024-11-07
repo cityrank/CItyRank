@@ -17,6 +17,15 @@ const map = new mapboxgl.Map({
     projection: 'globe' // Set the map projection to a globe
 });
 
+// Define color codes based on rating for country polygons
+const countryRatingColors = {
+    5: '#2ecc71',
+    4: '#27ae60',
+    3: '#f1c40f',
+    2: '#e67e22',
+    1: '#e74c3c'
+};
+
 map.on('style.load', () => {
     console.log("Map loaded");  // Debug check if Mapbox style loads
     map.setFog({
@@ -35,7 +44,7 @@ map.on('style.load', () => {
 
 // Fetch country data and add polygons based on average rating
 function fetchCountryRatings() {
-    console.log("Fetching country ratings from CloudKit");  // Debug check
+    console.log("Fetching country ratings from CloudKit");
     CloudKit.getDefaultContainer().publicCloudDatabase.performQuery({
         recordType: 'CityComment'
     }).then(response => {
@@ -44,7 +53,7 @@ function fetchCountryRatings() {
             return;
         }
 
-        console.log("Fetched records:", response.records);  // Debug check for records
+        console.log("Fetched records:", response.records);
 
         const countryRatings = {};
         response.records.forEach(record => {
@@ -77,15 +86,26 @@ function addCountryPolygon(country, rating) {
     const sourceId = `${country}-source`;
     const layerId = `${country}-layer`;
 
+    // Debugging statements to trace country, color, source, and layer
+    console.log(`Attempting to add polygon for ${country} with color ${color}`);
+    
     // Remove existing source and layer if they exist
-    if (map.getSource(sourceId)) map.removeSource(sourceId);
-    if (map.getLayer(layerId)) map.removeLayer(layerId);
+    if (map.getSource(sourceId)) {
+        console.log(`Removing existing source for ${country}`);
+        map.removeSource(sourceId);
+    }
+    if (map.getLayer(layerId)) {
+        console.log(`Removing existing layer for ${country}`);
+        map.removeLayer(layerId);
+    }
 
+    // Add country boundaries as vector source
     map.addSource(sourceId, {
         type: 'vector',
         url: 'mapbox://mapbox.country-boundaries-v1'
     });
 
+    // Add a new layer for the country polygon
     map.addLayer({
         id: layerId,
         type: 'fill',
@@ -97,6 +117,8 @@ function addCountryPolygon(country, rating) {
             'fill-opacity': 0.5
         }
     });
+
+    console.log(`Polygon added for ${country} with layer ID ${layerId}`);
 }
 
 // Toggle visibility based on zoom level
