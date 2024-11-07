@@ -38,7 +38,7 @@
             container: 'map',
             style: 'mapbox://styles/mapbox/streets-v11',
             center: [0, 0],
-            zoom: 2,
+            zoom: 1,
             projection: 'globe'
         });
 
@@ -53,7 +53,7 @@
             });
 
             map.setMinZoom(1.0);
-            map.setMaxZoom(7.0);
+            map.setMaxZoom(11.0);
 
             // Hide non-essential layers
             const layersToHide = [
@@ -288,7 +288,7 @@
         // Toggle visibility based on zoom level
         map.on('zoom', () => {
             const currentZoom = map.getZoom();
-            const visibility = currentZoom <= 2.0 ? 'visible' : 'none';
+            const visibility = currentZoom <= 4.0 ? 'visible' : 'none';
 
             map.getStyle().layers.forEach(layer => {
                 if (layer.id.includes('-boundary-layer')) {
