@@ -190,15 +190,12 @@
             });
 
             // Add polygons for countries based on average ratings
-            setTimeout(() => {
-                Object.keys(countryRatings).forEach(countryName => {
-                    const averageRating = countryRatings[countryName].totalRating / countryRatings[countryName].count;
-                    addPolygonForCountry(countryName, averageRating);
-                });
-            }, 3000); // Delay to ensure all city coordinates are processed
-        }).catch(error => {
-            console.error('CloudKit query failed:', error);
-        });
+// Add polygons for countries based on average ratings
+Object.keys(countryRatings).forEach(countryName => {
+    const averageRating = countryRatings[countryName].totalRating / countryRatings[countryName].count;
+    addPolygonForCountry(countryName, averageRating);
+});
+
 
         // Geocode city name to coordinates
         function geocodeCity(cityName) {
@@ -264,10 +261,7 @@
             });
         }
 
-function addPolygonForCountry(countryName, rating) {
-    if (countryName === 'Czech Republic' || countryName === 'Czechia') {
-        countryName = 'Czechia';
-    }
+        function addPolygonForCountry(countryName, rating) {
             const color = ratingColors[Math.round(rating)] || '#3498db';
 
             const sourceId = ${countryName}-boundary-source;
