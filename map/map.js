@@ -17,8 +17,8 @@ const map = new mapboxgl.Map({
     projection: 'globe'
 });
 
-// Define rating colors
-const ratingColors = {
+// Define rating colors with a unique variable name
+const countryRatingColors = {
     5: '#2ecc71', // Bright green
     4: '#27ae60', // Green
     3: '#f1c40f', // Yellow
@@ -77,7 +77,7 @@ function calculateAverage(ratings) {
 
 // Add polygon for a country based on calculated rating
 function addCountryPolygon(country, rating) {
-    const color = ratingColors[rating] || '#3498db';  // Default to blue if no rating
+    const color = countryRatingColors[rating] || '#3498db';  // Default to blue if no rating
     const countryCodeMap = { 'Spain': 'ES' };  // Add Spain as a test case
 
     if (!countryCodeMap[country]) return;  // Only add polygons for defined countries (e.g., Spain)
