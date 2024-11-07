@@ -64,10 +64,10 @@ function addCountryBoundariesWithColors() {
             'fill-color': [
                 'match',
                 ['get', 'iso_3166_1_alpha_2'],
-                'US', countryRatingColors['US'],
-                'CA', countryRatingColors['CA'],
-                'MX', countryRatingColors['MX'],
-                '#cccccc' // Default color if no match
+                'US', countryRatingColors['US'] || '#cccccc',
+                'CA', countryRatingColors['CA'] || '#cccccc',
+                'MX', countryRatingColors['MX'] || '#cccccc',
+                '#cccccc' // Default color for countries without specified color
             ],
             'fill-opacity': 0.5
         }
