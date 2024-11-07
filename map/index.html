@@ -190,12 +190,15 @@
             });
 
             // Add polygons for countries based on average ratings
-// Add polygons for countries based on average ratings
-Object.keys(countryRatings).forEach(countryName => {
-    const averageRating = countryRatings[countryName].totalRating / countryRatings[countryName].count;
-    addPolygonForCountry(countryName, averageRating);
-});
-
+            setTimeout(() => {
+                Object.keys(countryRatings).forEach(countryName => {
+                    const averageRating = countryRatings[countryName].totalRating / countryRatings[countryName].count;
+                    addPolygonForCountry(countryName, averageRating);
+                });
+            }, 1); // Delay to ensure all city coordinates are processed
+        }).catch(error => {
+            console.error('CloudKit query failed:', error);
+        });
 
         // Geocode city name to coordinates
         function geocodeCity(cityName) {
