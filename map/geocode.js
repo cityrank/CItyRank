@@ -8,34 +8,38 @@ const ratingColors = {
 };
 
 // Fetch data from CloudKit and plot on the map
-function fetchCityRatings() {
-    CloudKit.getDefaultContainer().publicCloudDatabase.performQuery({
-        recordType: 'CityComment'
-    }).then(response => {
-        if (response.hasErrors) {
-            console.error('CloudKit query failed:', response.errors);
-            return;
-        }
+CloudKit.getDefaultContainer().publicCloudDatabase.performQuery({
+    recordType: 'CityComment'
+}).then(response => {
+    if (response.hasErrors) {
+        console.error('CloudKit query failed:', response.errors);
+        return;
+    }
 
-        const records = response.records;
-        const filteredRecords = records.filter(record => {
-            const rating = record.fields.rating ? record.fields.rating.value : null;
-            return rating !== null && rating !== undefined && !isNaN(rating);
+    const records = response.records;
+
+    // Filter only records with a valid rating
+    const filteredRecords = records.filter(record => {
+        const rating = record.fields.rating ? record.fields.rating.value : null;
+        return rating !== null && rating !== undefined && !isNaN(rating);
+    });
+
+    // Process filtered records
+    filteredRecords.forEach(record => {
+        const cityName = record.fields.cityName ? record.fields.cityName.value : "Unknown City";
+        const comment = record.fields.comment ? record.fields.comment.value : "No comment";
+        const rating = record.fields.rating.value;
+
+        // Geocode each city to find its coordinates
+        geocodeCity(cityName).then(coordinate => {
+            if (coordinate) {
+                addCityCircle(coordinate, { cityName, rating, comment });
+            }
         });
-
-        filteredRecords.forEach(record => {
-            const cityName = record.fields.cityName ? record.fields.cityName.value : "Unknown City";
-            const comment = record.fields.comment ? record.fields.comment.value : "No comment";
-            const rating = record.fields.rating.value;
-
-            geocodeCity(cityName).then(coordinate => {
-                if (coordinate) {
-                    addCityCircle(coordinate, { cityName, rating, comment });
-                }
-            });
-        });
-    }).catch(error => console.error('CloudKit query failed:', error));
-}
+    });
+}).catch(error => {
+    console.error('CloudKit query failed:', error);
+});
 
 // Geocode city name to coordinates
 function geocodeCity(cityName) {
@@ -52,8 +56,9 @@ function geocodeCity(cityName) {
 
 // Add a circle to the map for each city
 function addCityCircle(coordinate, city) {
-    const color = ratingColors[Math.round(city.rating)] || '#3498db';
+    const color = ratingColors[Math.round(city.rating)] || '#3498db'; // Default color if no rating
 
+    // Create a GeoJSON source and add it as a layer
     map.addLayer({
         id: `${city.cityName}-circle`,
         type: 'circle',
@@ -73,7 +78,7 @@ function addCityCircle(coordinate, city) {
             }
         },
         paint: {
-            'circle-radius': 10,
+            'circle-radius': 20,
             'circle-color': color,
             'circle-opacity': 0.7
         }
@@ -87,6 +92,7 @@ function addCityCircle(coordinate, city) {
             const rating = features[0].properties.rating;
             const comment = features[0].properties.comment;
 
+            // Display city details in a popup
             new mapboxgl.Popup()
                 .setLngLat(coordinate)
                 .setHTML(`
@@ -98,6 +104,3 @@ function addCityCircle(coordinate, city) {
         }
     });
 }
-
-// Fetch and display city ratings initially
-fetchCityRatings();
