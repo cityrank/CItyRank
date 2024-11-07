@@ -26,12 +26,13 @@
 
         // Initialize Mapbox
         mapboxgl.accessToken = 'sk.eyJ1IjoibWlraXRrbzEiLCJhIjoiY20wem1yNzNoMDY0bjJqcjN2dWUyaXlzZSJ9.W35tdauaLoA2m9xdH2Jzvw';
-        const map = new mapboxgl.Map({
-            container: 'map',
-            style: 'mapbox://styles/mapbox/streets-v11',
-            center: [longitude, latitude], // Default center coordinates
-            zoom: 10
-        });
+const map = new mapboxgl.Map({
+    container: 'map',
+    style: 'mapbox://styles/mapbox/streets-v11',
+    center: [0, 0], // Example: center on (0,0)
+    zoom: 10
+});
+
 
         // Fetch data from CloudKit
         CloudKit.getDefaultContainer().publicCloudDatabase.performQuery({
@@ -42,10 +43,14 @@
                 return;
             }
             const records = response.records;
-            records.forEach(record => {
-                const { longitude, latitude } = record.fields;
-                new mapboxgl.Marker().setLngLat([longitude, latitude]).addTo(map);
-            });
+records.forEach(record => {
+    const longitude = record.fields.longitude.value;
+    const latitude = record.fields.latitude.value;
+    new mapboxgl.Marker()
+        .setLngLat([longitude, latitude])
+        .addTo(map);
+});
+
         });
     </script>
 </body>
