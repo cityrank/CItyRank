@@ -121,16 +121,22 @@
 
             // Apply default colors for remaining layers
     map.getStyle().layers.forEach(layer => {
-        if (layer.type === 'fill' || layer.type === 'line') {
-            // Set water layers specifically to grayscale
-            if (layer.id.includes('ocean')) {
+        const layerId = layer.id.toLowerCase();
+
+        // Target water layers explicitly by looking for "water" in the layer name or id
+        if (layerId.includes('water')) {
+            if (layer.type === 'fill') {
                 map.setPaintProperty(layer.id, 'fill-color', '#d3d3d3');
-                map.setPaintProperty(layer.id, 'line-color', '#A9A9A9');
-            } else {
-                // Set other fill and line layers to grayscale as well
-                map.setPaintProperty(layer.id, 'fill-color', '#d3d3d3');
+            } else if (layer.type === 'line') {
                 map.setPaintProperty(layer.id, 'line-color', '#A9A9A9');
             }
+        }
+
+        // Apply default grayscale for other fill and line layers
+        if (layer.type === 'fill') {
+            map.setPaintProperty(layer.id, 'fill-color', '#d3d3d3');
+        } else if (layer.type === 'line') {
+            map.setPaintProperty(layer.id, 'line-color', '#A9A9A9');
         }
     });
         });
