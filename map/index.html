@@ -43,14 +43,16 @@ CloudKit.configure({
 
         // Initialize Mapbox
         // Initialize Mapbox
-        mapboxgl.accessToken = {{MAPBOX_TOKEN}};
-        const map = new mapboxgl.Map({
-            container: 'map',
-            style: 'mapbox://styles/mapbox/streets-v11',
-            center: [0, 0],
-            zoom: 2,
-            projection: 'globe'
-        });
+// Initialize Mapbox
+mapboxgl.accessToken = '{{MAPBOX_TOKEN}}';
+const map = new mapboxgl.Map({
+    container: 'map',
+    style: 'mapbox://styles/mapbox/streets-v11',
+    center: [0, 0],
+    zoom: 2,
+    projection: 'globe'
+});
+
 
                 // Add Navigation Control
         const navControl = new mapboxgl.NavigationControl();
