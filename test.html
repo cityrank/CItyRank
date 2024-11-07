@@ -123,7 +123,7 @@
     map.getStyle().layers.forEach(layer => {
         if (layer.type === 'fill' || layer.type === 'line') {
             // Set water layers specifically to grayscale
-            if (layer.id.includes('water')) {
+            if (layer.id.includes('ocean')) {
                 map.setPaintProperty(layer.id, 'fill-color', '#d3d3d3');
                 map.setPaintProperty(layer.id, 'line-color', '#A9A9A9');
             } else {
