@@ -33,25 +33,21 @@
 
         // Fetch data from CloudKit
         CloudKit.getDefaultContainer().publicCloudDatabase.performQuery({
-            recordType: 'CityComment',
-            filterBy: [{
-                fieldName: 'rating',
-                comparator: 'NOT_EQUAL',
-                fieldValue: { value: null }
-            }]
+            recordType: 'CityComment'
         }).then(response => {
             if (response.hasErrors) {
-                console.error(response.errors);
+                console.error('CloudKit query failed:', response.errors);
                 return;
             }
+
             const records = response.records;
             records.forEach(record => {
                 const cityName = record.fields.cityName.value;
-                const rating = record.fields.rating.value;
+                const rating = record.fields.rating ? record.fields.rating.value : "No rating";
                 const longitude = record.fields.longitude ? record.fields.longitude.value : 0;
                 const latitude = record.fields.latitude ? record.fields.latitude.value : 0;
 
-                // Add marker for each city with rating
+                // Add marker for each city
                 new mapboxgl.Marker()
                     .setLngLat([longitude, latitude])
                     .setPopup(new mapboxgl.Popup({ offset: 25 })
