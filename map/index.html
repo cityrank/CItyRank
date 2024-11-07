@@ -195,7 +195,7 @@
                     const averageRating = countryRatings[countryName].totalRating / countryRatings[countryName].count;
                     addPolygonForCountry(countryName, averageRating);
                 });
-            }, 3000); // Delay to ensure all city coordinates are processed
+            }, 1); // Delay to ensure all city coordinates are processed
         }).catch(error => {
             console.error('CloudKit query failed:', error);
         });
