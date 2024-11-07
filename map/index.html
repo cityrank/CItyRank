@@ -213,36 +213,42 @@
         }
 
         // Add a circle to the map for each city
-        function addCityCircle(coordinate, city) {
-            const color = ratingColors[Math.round(city.rating)] || '#3498db';
+function addCityCircle(coordinate, city) {
+    const color = ratingColors[Math.round(city.rating)] || '#3498db';
 
-            map.addLayer({
-                id: `${city.cityName}-circle`,
-                type: 'circle',
-                source: {
-                    type: 'geojson',
-                    data: {
-                        type: 'FeatureCollection',
-                        features: [{
-                            type: 'Feature',
-                            geometry: { type: 'Point', coordinates: coordinate },
-                            properties: {
-                                cityName: city.cityName,
-                                rating: city.rating,
-                                comment: city.comment
-                            }
-                        }]
+    map.addLayer({
+        id: `${city.cityName}-circle`,
+        type: 'circle',
+        source: {
+            type: 'geojson',
+            data: {
+                type: 'FeatureCollection',
+                features: [{
+                    type: 'Feature',
+                    geometry: { type: 'Point', coordinates: coordinate },
+                    properties: {
+                        cityName: city.cityName,
+                        rating: city.rating,
+                        comment: city.comment
                     }
-                },
-                paint: {
-                    'circle-radius': 20,
-                    'circle-color': color,
-                    'circle-opacity': 0.7
-                },
-                layout: {
-                    'visibility': map.getZoom() > 4.0 ? 'visible' : 'none'
-                }
-            });
+                }]
+            }
+        },
+        paint: {
+            // Adjust circle-radius dynamically based on the zoom level
+            'circle-radius': [
+                'interpolate', ['linear'], ['zoom'],
+                2, 4,     // At zoom level 2, circle radius will be 4
+                6, 10,    // At zoom level 6, circle radius will be 10
+                10, 20    // At zoom level 10 or higher, circle radius will be 20
+            ],
+            'circle-color': color,
+            'circle-opacity': 0.7
+        },
+        layout: {
+            'visibility': map.getZoom() > 4.0 ? 'visible' : 'none'
+        }
+    });
 
             map.on('click', `${city.cityName}-circle`, (e) => {
                 const features = map.queryRenderedFeatures(e.point, { layers: [`${city.cityName}-circle`] });
