@@ -41,6 +41,9 @@ map.on('style.load', () => {
     map.setMaxZoom(11.0);
 
     fetchCountryRatings();
+
+    // Hardcoded test for a specific country to verify polygons are displaying
+    addCountryPolygon("United States", 4);
 });
 
 // Fetch country data and add polygons based on average rating
@@ -62,6 +65,7 @@ function fetchCountryRatings() {
             if (country && rating) {
                 if (!countryRatings[country]) countryRatings[country] = [];
                 countryRatings[country].push(rating);
+                console.log(`Processed record for country: ${country}, Rating: ${rating}`);
             }
         });
 
@@ -82,7 +86,7 @@ function calculateAverage(ratings) {
 // Convert country name to ISO code if available
 function convertCountryNameToISOCode(countryName) {
     const countryCodes = {
-        "United States": "US", "Canada": "CA", "Mexico": "MX", // Add other mappings as needed
+        "United States": "US", "Canada": "CA", "Spain": "ES", // Add other mappings as needed
         // Add more countries as needed
     };
     return countryCodes[countryName] || countryName;
@@ -129,6 +133,11 @@ function addCountryPolygon(country, rating) {
         console.log(`Polygon layer added for ${isoCode} (${country}) with color ${color}`);
     } catch (error) {
         console.error(`Error adding polygon layer for ${country} (${isoCode}):`, error);
+    }
+
+    // Verify if the layer was added
+    if (!map.getLayer(layerId)) {
+        console.error(`Layer ${layerId} not added for ${country}`);
     }
 }
 
