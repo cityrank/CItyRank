@@ -14,7 +14,7 @@ const map = new mapboxgl.Map({
     style: 'mapbox://styles/mapbox/streets-v11',
     center: [0, 0],
     zoom: 2,
-    projection: 'globe'
+    projection: 'globe' // Set the map projection to a globe
 });
 
 // Define color codes based on rating for country polygons
@@ -26,13 +26,12 @@ const countryRatingColors = {
     1: '#e74c3c'
 };
 
-// Apply atmosphere settings
+// Apply globe settings and atmosphere
 map.on('style.load', () => {
-    console.log("Map style loaded");  // Confirm style load
     map.setFog({
-        color: 'rgba(135, 206, 235, 0.5)',
-        "high-color": 'rgba(70, 130, 180, 0.8)',
-        "space-color": 'rgba(20, 24, 82, 1.0)',
+        color: 'rgba(135, 206, 235, 0.5)', // Light sky blue near horizon
+        "high-color": 'rgba(70, 130, 180, 0.8)', // Soft blue higher in the atmosphere
+        "space-color": 'rgba(20, 24, 82, 1.0)', // Deep navy for space
         "horizon-blend": 0.1,
         "star-intensity": 0.1
     });
@@ -40,13 +39,11 @@ map.on('style.load', () => {
     map.setMinZoom(1.0);
     map.setMaxZoom(11.0);
 
-    // Fetch and add polygons after style load
-    fetchCountryRatings();
+    fetchCountryRatings();  // Fetch and apply country rating polygons
 });
 
 // Fetch country data and add polygons based on average rating
 function fetchCountryRatings() {
-    console.log("Fetching country ratings from CloudKit");
     CloudKit.getDefaultContainer().publicCloudDatabase.performQuery({
         recordType: 'CityComment'
     }).then(response => {
@@ -68,7 +65,6 @@ function fetchCountryRatings() {
 
         Object.keys(countryRatings).forEach(country => {
             const avgRating = calculateAverage(countryRatings[country]);
-            console.log(`Adding polygon for ${country} with average rating ${avgRating}`);
             addCountryPolygon(country, avgRating);
         });
     }).catch(error => console.error('CloudKit query failed:', error));
@@ -80,45 +76,58 @@ function calculateAverage(ratings) {
     return sum / ratings.length;
 }
 
+// Convert country name to ISO code if available
+function convertCountryNameToISOCode(countryName) {
+    const countryCodes = {
+        "United States": "US", "Canada": "CA", "Spain": "ES", // Add other mappings as needed
+        // Add more countries as needed
+    };
+    return countryCodes[countryName] || countryName;
+}
+
 // Add polygon for a country based on rating
 function addCountryPolygon(country, rating) {
+    const isoCode = convertCountryNameToISOCode(country);  // Convert country to ISO if needed
     const color = countryRatingColors[Math.round(rating)] || '#3498db';
 
     // Define unique source and layer identifiers
-    const sourceId = `${country}-boundary-source`;
-    const layerId = `${country}-boundary-layer`;
+    const sourceId = `${isoCode}-source`;
+    const layerId = `${isoCode}-layer`;
 
     // Remove existing source and layer if they exist
     if (map.getSource(sourceId)) map.removeSource(sourceId);
     if (map.getLayer(layerId)) map.removeLayer(layerId);
 
-    // Add the country boundaries vector source
     map.addSource(sourceId, {
         type: 'vector',
         url: 'mapbox://mapbox.country-boundaries-v1'
     });
 
-    // Log after source addition
-    if (map.getSource(sourceId)) {
-        console.log(`Source added for ${country} with sourceId ${sourceId}`);
-    } else {
-        console.error(`Failed to add source for ${country}`);
-    }
-
-    // Attempt to add the polygon layer for the country
-    try {
-        map.addLayer({
-            id: layerId,
-            type: 'fill',
-            source: sourceId,
-            'source-layer': 'country_boundaries',  // Verify this matches the exact name in Mapbox Studio
-            paint: {
-                'fill-color': color,
-                'fill-opacity': 0.5
-            }
-        });
-        console.log(`Polygon layer added for ${country} with color ${color}`);
-    } catch (error) {
-        console.error(`Error adding polygon layer for ${country}:`, error);
-    }
+    // Add a new layer for the country polygon
+    map.addLayer({
+        id: layerId,
+        type: 'fill',
+        source: sourceId,
+        'source-layer': 'country_boundaries',
+        filter: ['==', 'iso_3166_1_alpha_2', isoCode],
+        paint: {
+            'fill-color': color,
+            'fill-opacity': 0.5
+        }
+    });
 }
+
+// Toggle visibility based on zoom level
+map.on('zoom', () => {
+    const zoom = map.getZoom();
+    const isVisible = zoom < 4 ? 'visible' : 'none';
+
+    Object.keys(map.getStyle().sources).forEach(sourceId => {
+        if (sourceId.includes("-source")) {
+            const layerId = sourceId.replace("-source", "-layer");
+            if (map.getLayer(layerId)) {
+                map.setLayoutProperty(layerId, 'visibility', isVisible);
+            }
+        }
+    });
+});
