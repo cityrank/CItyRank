@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>CityRank Web</title>
+    <link href="https://api.mapbox.com/mapbox-gl-js/v3.7.0/mapbox-gl.css" rel="stylesheet">
     <script src="https://api.mapbox.com/mapbox-gl-js/v3.7.0/mapbox-gl.js"></script>
     <script src="https://cdn.apple-cloudkit.com/ck/2/cloudkit.js"></script>
 <style>
@@ -106,7 +107,7 @@
                "natural-line-label", "natural-point-label",
                "poi-label", "transit-label",
                "airport-label", "settlement-subdivision-label",
-               "state-label", "water-line-label", "water-point-label", "waterway-label", "admin-1-boundary", "admin-1-boundary-bg"
+               "state-label", "water-line-label", "water-point-label", "waterway-label", "admin-1-boundary", "admin-1-boundary-bg", "hillshade", "terrain", 
             ];
 
             layersToHide.forEach(layerId => {
@@ -114,6 +115,16 @@
                     map.setLayoutProperty(layerId, 'visibility', 'none');
                 }
             });
+
+            // Ensure water layers are set to grayscale
+const waterLayers = ["water", "water-shadow", "water-line"];
+waterLayers.forEach(layerId => {
+    if (map.getLayer(layerId)) {
+        map.setPaintProperty(layerId, 'fill-color', '#d3d3d3'); // Light grey
+        map.setPaintProperty(layerId, 'line-color', '#A9A9A9'); // Dark grey
+    }
+});
+
 
             // Apply default colors for remaining layers
             map.getStyle().layers.forEach(layer => {
