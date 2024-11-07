@@ -28,6 +28,7 @@ const countryRatingColors = {
 
 // Apply globe settings, atmosphere, and adjust appearance of layers
 map.on('style.load', () => {
+    console.log("Map style loaded");  // Confirm style load
     map.setFog({
         color: 'rgba(135, 206, 235, 0.5)', // Light sky blue near horizon
         "high-color": 'rgba(70, 130, 180, 0.8)', // Soft blue higher in the atmosphere
@@ -44,6 +45,7 @@ map.on('style.load', () => {
 
 // Fetch country data and add polygons based on average rating
 function fetchCountryRatings() {
+    console.log("Fetching country ratings from CloudKit");  // Check query initiation
     CloudKit.getDefaultContainer().publicCloudDatabase.performQuery({
         recordType: 'CityComment'
     }).then(response => {
@@ -65,6 +67,7 @@ function fetchCountryRatings() {
 
         Object.keys(countryRatings).forEach(country => {
             const avgRating = calculateAverage(countryRatings[country]);
+            console.log(`Attempting to add polygon for ${country} with average rating ${avgRating}`);
             addCountryPolygon(country, avgRating);
         });
     }).catch(error => console.error('CloudKit query failed:', error));
@@ -103,17 +106,30 @@ function addCountryPolygon(country, rating) {
         url: 'mapbox://mapbox.country-boundaries-v1'
     });
 
-    map.addLayer({
-        id: layerId,
-        type: 'fill',
-        source: sourceId,
-        'source-layer': 'country_boundaries',
-        filter: ['==', 'iso_3166_1_alpha_2', isoCode],  // Use ISO code for filtering
-        paint: {
-            'fill-color': color,
-            'fill-opacity': 0.5
-        }
-    });
+    // Verify source addition
+    if (map.getSource(sourceId)) {
+        console.log(`Source added for ${isoCode} (${country})`);
+    } else {
+        console.error(`Failed to add source for ${isoCode} (${country})`);
+    }
+
+    try {
+        // Add a new layer for the country polygon
+        map.addLayer({
+            id: layerId,
+            type: 'fill',
+            source: sourceId,
+            'source-layer': 'country_boundaries',
+            filter: ['==', 'iso_3166_1_alpha_2', isoCode],  // Use ISO code for filtering
+            paint: {
+                'fill-color': color,
+                'fill-opacity': 0.5
+            }
+        });
+        console.log(`Polygon layer added for ${isoCode} (${country}) with color ${color}`);
+    } catch (error) {
+        console.error(`Error adding polygon layer for ${country} (${isoCode}):`, error);
+    }
 }
 
 // Toggle visibility based on zoom level
