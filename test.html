@@ -1,14 +1,12 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
     <title>CityRank Web</title>
-    <!-- Include Mapbox CSS and JS -->
     <link href="https://api.mapbox.com/mapbox-gl-js/v3.7.0/mapbox-gl.css" rel="stylesheet">
     <script src="https://api.mapbox.com/mapbox-gl-js/v3.7.0/mapbox-gl.js"></script>
-    <!-- Include CloudKit JS -->
     <script src="https://cdn.apple-cloudkit.com/ck/2/cloudkit.js"></script>
     <style>
-        /* Basic styling */
         #map { width: 100%; height: 100vh; }
     </style>
 </head>
@@ -19,11 +17,8 @@
         CloudKit.configure({
             containers: [{
                 containerIdentifier: 'iCloud.com.mikita.mapapp',
-                apiTokenAuth: { 
-                    apiToken: 'dd4d64c3658e17b6e76e0b2ab9747b521402cce76910c29e89d6c6d3615a6cbf', 
-                    persist: true 
-                },
-                environment: 'development' // Change to 'production' if deploying to production
+                apiTokenAuth: { apiToken: 'dd4d64c3658e17b6e76e0b2ab9747b521402cce76910c29e89d6c6d3615a6cbf', persist: true },
+                environment: 'development' // or 'production' depending on your setup
             }]
         });
 
@@ -32,54 +27,39 @@
         const map = new mapboxgl.Map({
             container: 'map',
             style: 'mapbox://styles/mapbox/streets-v11',
-            center: [0, 0], // Adjust the center to the desired location
-            zoom: 2 // Adjust initial zoom level
+            center: [0, 0],
+            zoom: 2
         });
 
-        // Add navigation controls to the map
-        map.addControl(new mapboxgl.NavigationControl());
-
         // Fetch data from CloudKit
-        const container = CloudKit.getDefaultContainer();
-        const publicDB = container.publicCloudDatabase;
+        CloudKit.getDefaultContainer().publicCloudDatabase.performQuery({
+            recordType: 'CityComment',
+            filterBy: [{
+                fieldName: 'rating',
+                comparator: 'NOT_EQUAL',
+                fieldValue: { value: null }
+            }]
+        }).then(response => {
+            if (response.hasErrors) {
+                console.error(response.errors);
+                return;
+            }
+            const records = response.records;
+            records.forEach(record => {
+                const cityName = record.fields.cityName.value;
+                const rating = record.fields.rating.value;
+                const longitude = record.fields.longitude ? record.fields.longitude.value : 0;
+                const latitude = record.fields.latitude ? record.fields.latitude.value : 0;
 
-        container.setUpAuth().then(user => {
-            console.log("User authenticated:", user);
-
-            // Perform the query to fetch city records
-            publicDB.performQuery({
-                recordType: 'YourRecordType', // Replace 'YourRecordType' with your actual record type name
-                filterBy: [{
-                    fieldName: 'longitude',
-                    comparator: 'NOT_NULL'
-                }, {
-                    fieldName: 'latitude',
-                    comparator: 'NOT_NULL'
-                }]
-            }).then(response => {
-                if (response.hasErrors) {
-                    console.error("Error fetching records:", response.errors);
-                    return;
-                }
-                
-                // Add markers for each record on the map
-                const records = response.records;
-                records.forEach(record => {
-                    const longitude = record.fields.longitude.value;
-                    const latitude = record.fields.latitude.value;
-
-                    // Check if latitude and longitude are available
-                    if (longitude !== undefined && latitude !== undefined) {
-                        new mapboxgl.Marker()
-                            .setLngLat([longitude, latitude])
-                            .addTo(map);
-                    }
-                });
-            }).catch(error => {
-                console.error("CloudKit query failed:", error);
+                // Add marker for each city with rating
+                new mapboxgl.Marker()
+                    .setLngLat([longitude, latitude])
+                    .setPopup(new mapboxgl.Popup({ offset: 25 })
+                        .setText(`${cityName}: Rating ${rating}`))
+                    .addTo(map);
             });
         }).catch(error => {
-            console.error("User authentication failed:", error);
+            console.error('CloudKit query failed:', error);
         });
     </script>
 </body>
