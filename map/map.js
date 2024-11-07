@@ -26,13 +26,12 @@ const countryRatingColors = {
     1: '#e74c3c'
 };
 
-// Apply globe settings, atmosphere, and adjust appearance of layers
+// Apply atmosphere settings
 map.on('style.load', () => {
-    console.log("Map style loaded");  // Confirm style load
     map.setFog({
-        color: 'rgba(135, 206, 235, 0.5)', // Light sky blue near horizon
-        "high-color": 'rgba(70, 130, 180, 0.8)', // Soft blue higher in the atmosphere
-        "space-color": 'rgba(20, 24, 82, 1.0)', // Deep navy for space
+        color: 'rgba(135, 206, 235, 0.5)',
+        "high-color": 'rgba(70, 130, 180, 0.8)',
+        "space-color": 'rgba(20, 24, 82, 1.0)',
         "horizon-blend": 0.1,
         "star-intensity": 0.1
     });
@@ -45,7 +44,6 @@ map.on('style.load', () => {
 
 // Fetch country data and add polygons based on average rating
 function fetchCountryRatings() {
-    console.log("Fetching country ratings from CloudKit");  // Check query initiation
     CloudKit.getDefaultContainer().publicCloudDatabase.performQuery({
         recordType: 'CityComment'
     }).then(response => {
@@ -67,7 +65,6 @@ function fetchCountryRatings() {
 
         Object.keys(countryRatings).forEach(country => {
             const avgRating = calculateAverage(countryRatings[country]);
-            console.log(`Attempting to add polygon for ${country} with average rating ${avgRating}`);
             addCountryPolygon(country, avgRating);
         });
     }).catch(error => console.error('CloudKit query failed:', error));
@@ -79,23 +76,13 @@ function calculateAverage(ratings) {
     return sum / ratings.length;
 }
 
-// Convert country name to ISO code if available
-function convertCountryNameToISOCode(countryName) {
-    const countryCodes = {
-        "United States": "US", "Canada": "CA", "Mexico": "MX", // Add other mappings as needed
-        // Add more countries as needed
-    };
-    return countryCodes[countryName] || countryName;
-}
-
 // Add polygon for a country based on rating
 function addCountryPolygon(country, rating) {
-    const isoCode = convertCountryNameToISOCode(country);  // Convert country to ISO if needed
     const color = countryRatingColors[Math.round(rating)] || '#3498db';
 
     // Define unique source and layer identifiers
-    const sourceId = `${isoCode}-source`;
-    const layerId = `${isoCode}-layer`;
+    const sourceId = `${country}-boundary-source`;
+    const layerId = `${country}-boundary-layer`;
 
     // Remove existing source and layer if they exist
     if (map.getSource(sourceId)) map.removeSource(sourceId);
@@ -106,29 +93,20 @@ function addCountryPolygon(country, rating) {
         url: 'mapbox://mapbox.country-boundaries-v1'
     });
 
-    // Verify source addition
-    if (map.getSource(sourceId)) {
-        console.log(`Source added for ${isoCode} (${country})`);
-    } else {
-        console.error(`Failed to add source for ${isoCode} (${country})`);
-    }
-
     try {
-        // Add a new layer for the country polygon
         map.addLayer({
             id: layerId,
             type: 'fill',
             source: sourceId,
             'source-layer': 'country_boundaries',
-            // Remove filter temporarily to ensure polygons are visible for testing
             paint: {
                 'fill-color': color,
                 'fill-opacity': 0.5
             }
         });
-        console.log(`Polygon layer added for ${isoCode} (${country}) with color ${color}`);
+        console.log(`Polygon layer added for ${country} with color ${color}`);
     } catch (error) {
-        console.error(`Error adding polygon layer for ${country} (${isoCode}):`, error);
+        console.error(`Error adding polygon layer for ${country}:`, error);
     }
 }
 
@@ -138,7 +116,7 @@ map.on('zoom', () => {
     const isVisible = zoom < 4 ? 'visible' : 'none';
 
     Object.keys(map.getStyle().sources).forEach(sourceId => {
-        if (sourceId.includes("-source")) {
+        if (sourceId.includes("-boundary-source")) {
             map.setLayoutProperty(sourceId.replace("-source", "-layer"), 'visibility', isVisible);
         }
     });
