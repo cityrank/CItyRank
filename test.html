@@ -120,12 +120,12 @@
 
 
             // Apply default colors for remaining layers
-            map.getStyle().layers.forEach(layer => {
-                if (layer.type === 'fill' || layer.type === 'line') {
-                    map.setPaintProperty(layer.id, 'fill-color', '#d3d3d3');
-                    map.setPaintProperty(layer.id, 'line-color', '#A9A9A9');
-                }
-            });
+    map.getStyle().layers.forEach(layer => {
+        if (layer.type === 'fill' || layer.type === 'line') {
+            map.setPaintProperty(layer.id, 'fill-color', '#d3d3d3'); // Light gray for fill
+            map.setPaintProperty(layer.id, 'line-color', '#A9A9A9'); // Dark gray for lines
+        }
+    });
         });
 
         // Colors based on rating
