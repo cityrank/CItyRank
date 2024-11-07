@@ -42,9 +42,8 @@ CloudKit.configure({
 
 
         // Initialize Mapbox
-   const mapboxTokenParts = ['pk.eyJ1IjoibWlraXRrbzEiLCJ', 'hIjoiY20wemJxaDVzMDVheDJqczg0NnV3MG1jbyJ9.8MNS07csgIJkUXTGjZiaYA'];
-mapboxgl.accessToken = mapboxTokenParts.join('');
-
+        // Initialize Mapbox
+        mapboxgl.accessToken = {{ secrets.MAPBOX }};
         const map = new mapboxgl.Map({
             container: 'map',
             style: 'mapbox://styles/mapbox/streets-v11',
