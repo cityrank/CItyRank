@@ -26,7 +26,6 @@ const countryRatingColors = {
     1: '#e74c3c'
 };
 
-// Load Mapbox Style and Initialize Fog, Bounds
 map.on('style.load', () => {
     console.log("Map loaded");
 
@@ -72,7 +71,7 @@ function fetchCountryRatings() {
 
         Object.keys(countryRatings).forEach(country => {
             const avgRating = calculateAverage(countryRatings[country]);
-            console.log(`Adding polygon for ${country} with average rating ${avgRating}`);
+            console.log(`Attempting to add polygon for ${country} with average rating ${avgRating}`);
             addCountryPolygon(country, avgRating);
         });
     }).catch(error => console.error('CloudKit query failed:', error));
@@ -90,14 +89,16 @@ function addCountryPolygon(country, rating) {
     const sourceId = `${country}-source`;
     const layerId = `${country}-layer`;
 
-    console.log(`Processing country: ${country}, Rating: ${rating}, Color: ${color}`); // Debug check
+    console.log(`Processing country: ${country}, Rating: ${rating}, Color: ${color}`);
 
     // Remove existing source and layer if they exist
     if (map.getSource(sourceId)) {
         map.removeSource(sourceId);
+        console.log(`Existing source removed for ${country}`);
     }
     if (map.getLayer(layerId)) {
         map.removeLayer(layerId);
+        console.log(`Existing layer removed for ${country}`);
     }
 
     // Add country boundaries as vector source
@@ -105,13 +106,6 @@ function addCountryPolygon(country, rating) {
         type: 'vector',
         url: 'mapbox://mapbox.country-boundaries-v1'
     });
-
-    // Check if source was added successfully
-    if (!map.getSource(sourceId)) {
-        console.error(`Source ${sourceId} could not be added for country ${country}`);
-        return;
-    }
-    console.log(`Source added for ${country}`);
 
     // Add a new layer for the country polygon
     map.addLayer({
