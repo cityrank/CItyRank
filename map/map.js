@@ -1,3 +1,12 @@
+// Initialize CloudKit
+CloudKit.configure({
+    containers: [{
+        containerIdentifier: 'iCloud.com.mikita.mapapp',
+        apiTokenAuth: { apiToken: '598d528768fec35ae10417d3313fd4ae6fc6c65907a2e2e7bf88491f0eff9d0a', persist: true },
+        environment: 'production'
+    }]
+});
+
 // Initialize Mapbox
 mapboxgl.accessToken = 'pk.eyJ1IjoibWlraXRrbzEiLCJhIjoiY20wemJxaDVzMDVheDJqczg0NnV3MG1jbyJ9.8MNS07csgIJkUXTGjZiaYA';
 const map = new mapboxgl.Map({
@@ -17,16 +26,24 @@ const countryRatingColors = {
     1: '#e74c3c'
 };
 
+// Apply globe settings, atmosphere, and adjust appearance of layers
 map.on('style.load', () => {
-    console.log("Map loaded with style:", map.getStyle());
+    map.setFog({
+        color: 'rgba(135, 206, 235, 0.5)', // Light sky blue near horizon
+        "high-color": 'rgba(70, 130, 180, 0.8)', // Soft blue higher in the atmosphere
+        "space-color": 'rgba(20, 24, 82, 1.0)', // Deep navy for space
+        "horizon-blend": 0.1,
+        "star-intensity": 0.1
+    });
 
-    // Fetch country ratings dynamically
+    map.setMinZoom(1.0);
+    map.setMaxZoom(11.0);
+
     fetchCountryRatings();
 });
 
 // Fetch country data and add polygons based on average rating
 function fetchCountryRatings() {
-    console.log("Fetching country ratings from CloudKit");
     CloudKit.getDefaultContainer().publicCloudDatabase.performQuery({
         recordType: 'CityComment'
     }).then(response => {
@@ -34,8 +51,6 @@ function fetchCountryRatings() {
             console.error('CloudKit query failed:', response.errors);
             return;
         }
-
-        console.log("Fetched records:", response.records);
 
         const countryRatings = {};
         response.records.forEach(record => {
@@ -50,7 +65,6 @@ function fetchCountryRatings() {
 
         Object.keys(countryRatings).forEach(country => {
             const avgRating = calculateAverage(countryRatings[country]);
-            console.log(`Adding polygon for ${country} with average rating ${avgRating}`);
             addCountryPolygon(country, avgRating);
         });
     }).catch(error => console.error('CloudKit query failed:', error));
@@ -62,48 +76,54 @@ function calculateAverage(ratings) {
     return sum / ratings.length;
 }
 
+// Convert country name to ISO code if available
+function convertCountryNameToISOCode(countryName) {
+    const countryCodes = {
+        "United States": "US", "Canada": "CA", "Mexico": "MX", // Add other mappings as needed
+        // Add more countries as needed
+    };
+    return countryCodes[countryName] || countryName;
+}
+
 // Add polygon for a country based on rating
 function addCountryPolygon(country, rating) {
+    const isoCode = convertCountryNameToISOCode(country);  // Convert country to ISO if needed
     const color = countryRatingColors[Math.round(rating)] || '#3498db';
-    const sourceId = `${country}-source`;
-    const layerId = `${country}-layer`;
 
-    console.log(`Processing country: ${country}, Rating: ${rating}, Color: ${color}`); // Debug check
+    // Define unique source and layer identifiers
+    const sourceId = `${isoCode}-source`;
+    const layerId = `${isoCode}-layer`;
 
     // Remove existing source and layer if they exist
     if (map.getSource(sourceId)) map.removeSource(sourceId);
     if (map.getLayer(layerId)) map.removeLayer(layerId);
 
-    // Add a vector source for country boundaries
     map.addSource(sourceId, {
         type: 'vector',
         url: 'mapbox://mapbox.country-boundaries-v1'
     });
 
-    console.log(`Source ${sourceId} added for ${country}`);
-
-    // Add a new layer for the country polygon
-    try {
-        map.addLayer({
-            id: layerId,
-            type: 'fill',
-            source: sourceId,
-            'source-layer': 'country_boundaries',
-            filter: ['==', 'name', country],
-            paint: {
-                'fill-color': color,
-                'fill-opacity': 0.5
-            }
-        });
-        console.log(`Polygon layer added for ${country}`);
-    } catch (error) {
-        console.error(`Error adding layer for ${country}:`, error);
-    }
-
-    // Verify layer addition
-    if (map.getLayer(layerId)) {
-        console.log(`Polygon layer successfully added for ${country}`);
-    } else {
-        console.error(`Failed to add polygon layer for ${country}`);
-    }
+    map.addLayer({
+        id: layerId,
+        type: 'fill',
+        source: sourceId,
+        'source-layer': 'country_boundaries',
+        filter: ['==', 'iso_3166_1_alpha_2', isoCode],  // Use ISO code for filtering
+        paint: {
+            'fill-color': color,
+            'fill-opacity': 0.5
+        }
+    });
 }
+
+// Toggle visibility based on zoom level
+map.on('zoom', () => {
+    const zoom = map.getZoom();
+    const isVisible = zoom < 4 ? 'visible' : 'none';
+
+    Object.keys(map.getStyle().sources).forEach(sourceId => {
+        if (sourceId.includes("-source")) {
+            map.setLayoutProperty(sourceId.replace("-source", "-layer"), 'visibility', isVisible);
+        }
+    });
+});
