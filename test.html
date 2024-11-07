@@ -116,14 +116,7 @@
                 }
             });
 
-            // Ensure water layers are set to grayscale
-const waterLayers = ["water", "water-shadow", "water-line"];
-waterLayers.forEach(layerId => {
-    if (map.getLayer(layerId)) {
-        map.setPaintProperty(layerId, 'fill-color', '#d3d3d3'); // Light grey
-        map.setPaintProperty(layerId, 'line-color', '#A9A9A9'); // Dark grey
-    }
-});
+
 
 
             // Apply default colors for remaining layers
