@@ -14,10 +14,10 @@ const map = new mapboxgl.Map({
     style: 'mapbox://styles/mapbox/streets-v11',
     center: [0, 0],
     zoom: 2,
-    projection: 'globe' // Set the map projection to a globe
+    projection: 'globe'
 });
 
-// Define color codes based on rating for country polygons
+// Define color codes for ratings
 const countryRatingColors = {
     5: '#2ecc71',
     4: '#27ae60',
@@ -29,9 +29,9 @@ const countryRatingColors = {
 // Apply globe settings and atmosphere
 map.on('style.load', () => {
     map.setFog({
-        color: 'rgba(135, 206, 235, 0.5)', // Light sky blue near horizon
-        "high-color": 'rgba(70, 130, 180, 0.8)', // Soft blue higher in the atmosphere
-        "space-color": 'rgba(20, 24, 82, 1.0)', // Deep navy for space
+        color: 'rgba(135, 206, 235, 0.5)',
+        "high-color": 'rgba(70, 130, 180, 0.8)',
+        "space-color": 'rgba(20, 24, 82, 1.0)',
         "horizon-blend": 0.1,
         "star-intensity": 0.1
     });
@@ -39,10 +39,11 @@ map.on('style.load', () => {
     map.setMinZoom(1.0);
     map.setMaxZoom(11.0);
 
-    fetchCountryRatings();  // Fetch and apply country rating polygons
+    console.log("Map style loaded successfully. Fetching country ratings...");
+    fetchCountryRatings();
 });
 
-// Fetch country data and add polygons based on average rating
+// Fetch country data and add polygons
 function fetchCountryRatings() {
     CloudKit.getDefaultContainer().publicCloudDatabase.performQuery({
         recordType: 'CityComment'
@@ -65,6 +66,7 @@ function fetchCountryRatings() {
 
         Object.keys(countryRatings).forEach(country => {
             const avgRating = calculateAverage(countryRatings[country]);
+            console.log(`Attempting to add polygon for ${country} with average rating ${avgRating}`);
             addCountryPolygon(country, avgRating);
         });
     }).catch(error => console.error('CloudKit query failed:', error));
@@ -76,21 +78,20 @@ function calculateAverage(ratings) {
     return sum / ratings.length;
 }
 
-// Convert country name to ISO code if available
+// Map country names to ISO codes
 function convertCountryNameToISOCode(countryName) {
     const countryCodes = {
-        "United States": "US", "Canada": "CA", "Spain": "ES", // Add other mappings as needed
-        // Add more countries as needed
+        "United States": "US", "Canada": "CA", "Mexico": "MX" // Add more mappings as needed
     };
     return countryCodes[countryName] || countryName;
 }
 
 // Add polygon for a country based on rating
 function addCountryPolygon(country, rating) {
-    const isoCode = convertCountryNameToISOCode(country);  // Convert country to ISO if needed
+    const isoCode = convertCountryNameToISOCode(country);
     const color = countryRatingColors[Math.round(rating)] || '#3498db';
 
-    // Define unique source and layer identifiers
+    // Define source and layer IDs
     const sourceId = `${isoCode}-source`;
     const layerId = `${isoCode}-layer`;
 
@@ -103,7 +104,15 @@ function addCountryPolygon(country, rating) {
         url: 'mapbox://mapbox.country-boundaries-v1'
     });
 
-    // Add a new layer for the country polygon
+    // Check source addition
+    if (map.getSource(sourceId)) {
+        console.log(`Source added for ${isoCode} (${country})`);
+    } else {
+        console.error(`Failed to add source for ${isoCode} (${country})`);
+        return;
+    }
+
+    // Add layer for country polygon
     map.addLayer({
         id: layerId,
         type: 'fill',
@@ -115,6 +124,12 @@ function addCountryPolygon(country, rating) {
             'fill-opacity': 0.5
         }
     });
+
+    if (map.getLayer(layerId)) {
+        console.log(`Polygon layer added for ${isoCode} (${country}) with color ${color}`);
+    } else {
+        console.error(`Failed to add polygon layer for ${isoCode} (${country})`);
+    }
 }
 
 // Toggle visibility based on zoom level
