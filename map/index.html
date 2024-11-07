@@ -163,20 +163,39 @@
                 return rating !== null && rating !== undefined && !isNaN(rating);
             });
 
+            const countryRatings = {};
+
             // Process filtered records
             filteredRecords.forEach(record => {
                 const cityName = record.fields.cityName ? record.fields.cityName.value : "Unknown City";
                 const comment = record.fields.comment ? record.fields.comment.value : "No comment";
                 const rating = record.fields.rating.value;
 
+                // Extract country name from cityName (assuming format "City, Country")
+                const countryName = cityName.split(',').pop().trim();
+
                 // Geocode each city to find its coordinates
                 geocodeCity(cityName).then(coordinate => {
                     if (coordinate) {
                         addCityCircle(coordinate, { cityName, rating, comment });
-                        updateCountryRatingForCity(cityName, coordinate, rating);
+
+                        // Accumulate ratings for each country
+                        if (!countryRatings[countryName]) {
+                            countryRatings[countryName] = { totalRating: 0, count: 0 };
+                        }
+                        countryRatings[countryName].totalRating += rating;
+                        countryRatings[countryName].count++;
                     }
                 });
             });
+
+            // Add polygons for countries based on average ratings
+            setTimeout(() => {
+                Object.keys(countryRatings).forEach(countryName => {
+                    const averageRating = countryRatings[countryName].totalRating / countryRatings[countryName].count;
+                    addPolygonForCountry(countryName, averageRating);
+                });
+            }, 3000); // Delay to ensure all city coordinates are processed
         }).catch(error => {
             console.error('CloudKit query failed:', error);
         });
@@ -245,73 +264,11 @@
             });
         }
 
-        // Fetch country average rating and add polygons
-        function updateCountryRatingForCity(cityName, coordinate, rating) {
-            getCountryCode(coordinate).then(countryCode => {
-                if (countryCode) {
-                    fetchCountryAverageRating(countryCode, averageRating => {
-                        if (averageRating !== null) {
-                            addPolygonForCountry(countryCode, averageRating);
-                        }
-                    });
-                }
-            });
-        }
-
-        function getCountryCode(coordinate) {
-            return fetch(`https://api.mapbox.com/geocoding/v5/mapbox.places/${coordinate[0]},${coordinate[1]}.json?types=country&access_token=${mapboxgl.accessToken}`)
-                .then(response => response.json())
-                .then(data => {
-                    if (data.features && data.features.length > 0) {
-                        return data.features[0].properties.short_code;
-                    }
-                    console.error("Failed to find country code for coordinate:", coordinate);
-                    return null;
-                });
-        }
-
-        function fetchCountryAverageRating(countryCode, callback) {
-            // Perform CloudKit query to calculate average rating for all cities in the country
-            CloudKit.getDefaultContainer().publicCloudDatabase.performQuery({
-                recordType: 'CityComment'
-            }).then(response => {
-                if (response.hasErrors) {
-                    console.error('CloudKit query failed:', response.errors);
-                    callback(null);
-                    return;
-                }
-
-                const records = response.records;
-                let totalRating = 0;
-                let count = 0;
-
-                records.forEach(record => {
-                    const cityName = record.fields.cityName ? record.fields.cityName.value : "Unknown City";
-                    const recordRating = record.fields.rating ? record.fields.rating.value : null;
-                    const recordCountry = record.fields.countryCode ? record.fields.countryCode.value : null;
-
-                    if (recordCountry === countryCode && recordRating !== null) {
-                        totalRating += recordRating;
-                        count++;
-                    }
-                });
-
-                if (count > 0) {
-                    callback(totalRating / count);
-                } else {
-                    callback(null);
-                }
-            }).catch(error => {
-                console.error('CloudKit query failed:', error);
-                callback(null);
-            });
-        }
-
-        function addPolygonForCountry(countryCode, rating) {
+        function addPolygonForCountry(countryName, rating) {
             const color = ratingColors[Math.round(rating)] || '#3498db';
 
-            const sourceId = `${countryCode}-boundary-source`;
-            const layerId = `${countryCode}-boundary-layer`;
+            const sourceId = `${countryName}-boundary-source`;
+            const layerId = `${countryName}-boundary-layer`;
 
             // Remove existing source or layer if they exist
             if (map.getLayer(layerId)) {
@@ -336,7 +293,7 @@
                     'fill-color': color,
                     'fill-opacity': 0.7
                 },
-                filter: ['==', 'iso_3166_1', countryCode.toUpperCase()]
+                filter: ['==', 'name_en', countryName]
             });
         }
     </script>
