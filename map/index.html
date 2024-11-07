@@ -264,7 +264,27 @@
             });
         }
 
+map.on('zoom', () => {
+    const currentZoom = map.getZoom();
+
+    // Remove country polygons if zoom level is >= 2.0
+    if (currentZoom >= 2.0) {
+        map.getStyle().layers.forEach(layer => {
+            if (layer.id.includes('-boundary-layer')) {
+                map.removeLayer(layer.id);
+            }
+        });
+    }
+});
+
 function addPolygonForCountry(countryName, rating) {
+    const currentZoom = map.getZoom();
+    
+    // Only add the polygon if the zoom level is below 2.0
+    if (currentZoom >= 2.0) {
+        return; // Exit the function if zoom is too high
+    }
+
     // Treat "Czech Republic" as "Czechia"
     if (countryName === "Czech Republic") {
         countryName = "Czechia";
@@ -301,6 +321,7 @@ function addPolygonForCountry(countryName, rating) {
         filter: ['==', 'name_en', countryName]
     });
 }
+
 
     </script>
 </body>
