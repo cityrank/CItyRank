@@ -15,7 +15,7 @@ jobs:
 
       - name: Replace Mapbox token
         run: |
-sed -i 's|{{MAPBOX_TOKEN}}|'"$MAPBOX"'|g' map/index.html
+sed -i 's|{{MAPBOX}}|'"$MAPBOX"'|g' map/index.html
         env:
           MAPBOX: ${{ secrets.MAPBOX }}
 
