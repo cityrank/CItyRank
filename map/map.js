@@ -17,7 +17,7 @@ const map = new mapboxgl.Map({
     projection: 'globe'
 });
 
-// Define rating colors with a unique variable name
+// Define rating colors
 const countryRatingColors = {
     5: '#2ecc71', // Bright green
     4: '#27ae60', // Green
@@ -37,7 +37,7 @@ map.on('style.load', () => {
         "star-intensity": 0.1
     });
     
-    // Fetch ratings for countries
+    // Fetch and display country ratings
     fetchCountryRatings();
 });
 
@@ -61,7 +61,7 @@ function fetchCountryRatings() {
             }
         });
 
-        // Calculate average ratings for each country
+        // Calculate average ratings for each country and add polygons
         Object.keys(countryRatings).forEach(country => {
             const avgRating = calculateAverage(countryRatings[country]);
             const roundedRating = Math.round(avgRating);
@@ -78,15 +78,10 @@ function calculateAverage(ratings) {
 // Add polygon for a country based on calculated rating
 function addCountryPolygon(country, rating) {
     const color = countryRatingColors[rating] || '#3498db';  // Default to blue if no rating
-    const countryCodeMap = { 'Spain': 'ES' };  // Add Spain as a test case
-
-    if (!countryCodeMap[country]) return;  // Only add polygons for defined countries (e.g., Spain)
-
-    const isoCode = countryCodeMap[country];  // Get ISO code for filtering
 
     // Define the fill layer
-    const sourceId = `${isoCode}-source`;
-    const layerId = `${isoCode}-layer`;
+    const sourceId = `${country}-source`;
+    const layerId = `${country}-layer`;
 
     // Remove existing source and layer if they exist
     if (map.getSource(sourceId)) map.removeSource(sourceId);
@@ -104,7 +99,7 @@ function addCountryPolygon(country, rating) {
         type: 'fill',
         source: sourceId,
         'source-layer': 'country_boundaries',
-        filter: ['==', 'iso_3166_1_alpha_2', isoCode],
+        filter: ['==', 'name', country],
         paint: {
             'fill-color': color,
             'fill-opacity': 0.5
