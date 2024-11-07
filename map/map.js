@@ -17,7 +17,6 @@ const map = new mapboxgl.Map({
     projection: 'globe' // Set the map projection to a globe
 });
 
-// Define color codes based on rating for country polygons
 const countryRatingColors = {
     5: '#2ecc71',
     4: '#27ae60',
@@ -28,8 +27,7 @@ const countryRatingColors = {
 
 map.on('style.load', () => {
     console.log("Map loaded");
-
-    // Set atmosphere and fog
+    
     map.setFog({
         color: 'rgba(135, 206, 235, 0.5)',
         "high-color": 'rgba(70, 130, 180, 0.8)',
@@ -41,7 +39,6 @@ map.on('style.load', () => {
     map.setMinZoom(1.0);
     map.setMaxZoom(11.0);
 
-    // Fetch country ratings
     fetchCountryRatings();
 });
 
@@ -91,40 +88,41 @@ function addCountryPolygon(country, rating) {
 
     console.log(`Processing country: ${country}, Rating: ${rating}, Color: ${color}`);
 
-    // Remove existing source and layer if they exist
-    if (map.getSource(sourceId)) {
-        map.removeSource(sourceId);
-        console.log(`Existing source removed for ${country}`);
-    }
-    if (map.getLayer(layerId)) {
-        map.removeLayer(layerId);
-        console.log(`Existing layer removed for ${country}`);
-    }
+    if (map.getSource(sourceId)) map.removeSource(sourceId);
+    if (map.getLayer(layerId)) map.removeLayer(layerId);
 
-    // Add country boundaries as vector source
+    // Log all current layers in mapbox to inspect available ones
+    console.log("Existing layers:", map.getStyle().layers);
+
     map.addSource(sourceId, {
         type: 'vector',
         url: 'mapbox://mapbox.country-boundaries-v1'
     });
 
-    // Add a new layer for the country polygon
-    map.addLayer({
-        id: layerId,
-        type: 'fill',
-        source: sourceId,
-        'source-layer': 'country_boundaries',
-        filter: ['==', 'name', country],
-        paint: {
-            'fill-color': color,
-            'fill-opacity': 0.5
-        }
-    });
+    console.log(`Source ${sourceId} added for ${country}`);
 
-    // Confirm if the layer was successfully added
+    // Attempt to add a layer for the country
+    try {
+        map.addLayer({
+            id: layerId,
+            type: 'fill',
+            source: sourceId,
+            'source-layer': 'country_boundaries',
+            filter: ['==', 'name', country],
+            paint: {
+                'fill-color': color,
+                'fill-opacity': 0.5
+            }
+        });
+        console.log(`Layer ${layerId} added for ${country}`);
+    } catch (error) {
+        console.error(`Error adding layer for ${country}:`, error);
+    }
+
     if (map.getLayer(layerId)) {
         console.log(`Polygon layer added for ${country}`);
     } else {
-        console.error(`Failed to add layer for ${country}`);
+        console.error(`Failed to add polygon layer for ${country}`);
     }
 }
 
