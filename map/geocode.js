@@ -17,10 +17,18 @@ CloudKit.getDefaultContainer().publicCloudDatabase.performQuery({
     }
 
     const records = response.records;
-    records.forEach(record => {
+
+    // Filter only records with a valid rating
+    const filteredRecords = records.filter(record => {
+        const rating = record.fields.rating ? record.fields.rating.value : null;
+        return rating !== null && rating !== undefined && !isNaN(rating);
+    });
+
+    // Process filtered records
+    filteredRecords.forEach(record => {
         const cityName = record.fields.cityName ? record.fields.cityName.value : "Unknown City";
         const comment = record.fields.comment ? record.fields.comment.value : "No comment";
-        const rating = record.fields.rating ? record.fields.rating.value : 0;
+        const rating = record.fields.rating.value;
 
         // Geocode each city to find its coordinates
         geocodeCity(cityName).then(coordinate => {
