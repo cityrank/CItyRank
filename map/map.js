@@ -17,14 +17,17 @@ const map = new mapboxgl.Map({
     projection: 'globe' 
 });
 
-// Country rating colors (simplified for testing)
-const testCountryColor = '#FF5733'; // Use a bright color to confirm visibility
+// Sample country color mapping for testing
+const countryRatingColors = {
+    "US": '#2ecc71',  // Green for the United States
+    "CA": '#3498db',  // Blue for Canada
+    "ES": '#e74c3c'   // Red for Mexico
+};
 
-// Apply atmosphere settings after style load
 map.on('style.load', () => {
     console.log("Map style loaded successfully.");
 
-    // Set fog effect for visual clarity
+    // Apply atmospheric effect for visual quality
     map.setFog({
         color: 'rgba(135, 206, 235, 0.5)',
         "high-color": 'rgba(70, 130, 180, 0.8)',
@@ -33,12 +36,11 @@ map.on('style.load', () => {
         "star-intensity": 0.1
     });
 
-    // Add the country boundaries source and a basic layer without filters
-    addCountryBoundaries();
+    // Add the country boundaries with dynamic colors
+    addCountryBoundariesWithColors();
 });
 
-// Function to add a basic unfiltered country layer
-function addCountryBoundaries() {
+function addCountryBoundariesWithColors() {
     const sourceId = "country-boundaries";
     const layerId = "country-boundaries-layer";
 
@@ -52,25 +54,24 @@ function addCountryBoundaries() {
         url: 'mapbox://mapbox.country-boundaries-v1'
     });
 
-    // Log confirmation of the source
-    console.log("Added country boundaries source.");
-
-    // Add a simple fill layer to display country boundaries
+    // Define the fill layer with a filter for the United States
     map.addLayer({
         id: layerId,
         type: 'fill',
         source: sourceId,
         'source-layer': 'country_boundaries',
         paint: {
-            'fill-color': testCountryColor,  // Set to a bright test color
+            'fill-color': [
+                'match',
+                ['get', 'iso_3166_1_alpha_2'],
+                'US', countryRatingColors['US'],
+                'CA', countryRatingColors['CA'],
+                'MX', countryRatingColors['MX'],
+                '#cccccc' // Default color if no match
+            ],
             'fill-opacity': 0.5
         }
     });
 
-    // Confirm layer addition
-    if (map.getLayer(layerId)) {
-        console.log("Country boundaries layer added successfully.");
-    } else {
-        console.error("Failed to add country boundaries layer.");
-    }
+    console.log("Country boundaries layer with dynamic colors added successfully.");
 }
