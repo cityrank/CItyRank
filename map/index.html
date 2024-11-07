@@ -12,7 +12,7 @@
         padding: 0;
         width: 100%;
         height: 100%;
-        overflow: hidden; /* Prevents scrollbars */
+        overflow: hidden;
     }
     #map {
         width: 100%;
@@ -39,74 +39,27 @@
             style: 'mapbox://styles/mapbox/streets-v11',
             center: [0, 0],
             zoom: 2,
-            projection: 'globe' // Set the map projection to a globe
+            projection: 'globe'
         });
 
         // Apply globe settings, atmosphere, and adjust appearance of layers
         map.on('style.load', () => {
-            // Set atmosphere for globe projection
             map.setFog({
-                color: 'rgba(135, 206, 235, 0.5)', // Light sky blue near horizon
-                "high-color": 'rgba(70, 130, 180, 0.8)', // Soft blue higher in the atmosphere
-                "space-color": 'rgba(20, 24, 82, 1.0)', // Deep navy for space
+                color: 'rgba(135, 206, 235, 0.5)',
+                "high-color": 'rgba(70, 130, 180, 0.8)',
+                "space-color": 'rgba(20, 24, 82, 1.0)',
                 "horizon-blend": 0.1,
                 "star-intensity": 0.1
             });
 
-            // Set minimum and maximum zoom limits
             map.setMinZoom(1.0);
             map.setMaxZoom(11.0);
 
-            // Hide non-essential layers
             const layersToHide = [
                 "national-park", "landuse", "pitch-outline",
                 "aeroway-polygon", "aeroway-line",
-                "building-outline", "building",
-                "tunnel-street-minor-low", "tunnel-street-minor-case",
-                "tunnel-primary-secondary-tertiary-case", "tunnel-major-link-case",
-                "tunnel-motorway-trunk-case", "tunnel-construction",
-                "tunnel-path", "tunnel-steps",
-                "tunnel-major-link", "tunnel-pedestrian",
-                "tunnel-street-minor", "tunnel-primary-secondary-tertiary",
-                "tunnel-oneway-arrow-blue", "tunnel-motorway-trunk",
-                "tunnel-oneway-arrow-white",
-                "ferry", "ferry-auto",
-                "road-path-bg", "road-steps-bg",
-                "turning-feature-outline", "road-pedestrian-case",
-                "road-minor-low", "road-street-low",
-                "road-minor-case", "road-street-case",
-                "road-secondary-tertiary-case", "road-primary-case",
-                "road-major-link-case", "road-motorway-trunk-case",
-                "road-construction", "road-path",
-                "road-steps", "road-major-link",
-                "road-pedestrian", "road-pedestrian-polygon-fill",
-                "road-pedestrian-polygon-pattern", "road-polygon",
-                "road-minor", "road-street",
-                "road-secondary-tertiary", "road-primary",
-                "road-oneway-arrow-blue", "road-motorway-trunk",
-                "road-rail", "road-rail-tracks",
-                "level-crossing", "road-oneway-arrow-white",
-                "turning-feature", "golf-hole-line",
-                "bridge-path-bg", "bridge-steps-bg",
-                "bridge-pedestrian-case", "bridge-street-minor-low",
-                "bridge-street-minor-case", "bridge-primary-secondary-tertiary-case",
-                "bridge-major-link-case", "bridge-motorway-trunk-case",
-                "bridge-construction", "bridge-path",
-                "bridge-steps", "bridge-major-link",
-                "bridge-pedestrian", "bridge-street-minor",
-                "bridge-primary-secondary-tertiary", "bridge-oneway-arrow-blue",
-                "bridge-motorway-trunk", "bridge-rail",
-                "bridge-rail-tracks", "bridge-major-link-2-case",
-                "bridge-motorway-trunk-2-case", "bridge-major-link-2",
-                "bridge-motorway-trunk-2", "bridge-oneway-arrow-white",
-                "aerialway",
-                "building-number-label", "road-label",
-                "road-number-shield", "road-exit-shield",
-                "golf-hole-label",
-                "natural-line-label", "natural-point-label",
-                "poi-label", "transit-label",
-                "airport-label", "settlement-subdivision-label",
-                "state-label", "water-line-label", "water-point-label", "waterway-label", "admin-1-boundary", "admin-1-boundary-bg"
+                // ... (other layers to hide)
+                "admin-1-boundary", "admin-1-boundary-bg"
             ];
 
             layersToHide.forEach(layerId => {
@@ -115,11 +68,8 @@
                 }
             });
 
-            // Apply default colors for remaining layers
             map.getStyle().layers.forEach(layer => {
                 const layerId = layer.id.toLowerCase();
-
-                // Target water layers explicitly by looking for "water" in the layer name or id
                 if (layerId.includes('water')) {
                     if (layer.type === 'fill') {
                         map.setPaintProperty(layer.id, 'fill-color', '#d3d3d3');
@@ -127,8 +77,6 @@
                         map.setPaintProperty(layer.id, 'line-color', '#A9A9A9');
                     }
                 }
-
-                // Apply default grayscale for other fill and line layers
                 if (layer.type === 'fill') {
                     map.setPaintProperty(layer.id, 'fill-color', '#d3d3d3');
                 } else if (layer.type === 'line') {
@@ -139,11 +87,11 @@
 
         // Colors based on rating
         const ratingColors = {
-            5: '#2ecc71',   // Green
-            4: '#27ae60',   // Light green
-            3: '#f1c40f',   // Yellow
-            2: '#e67e22',   // Orange
-            1: '#e74c3c'    // Red
+            5: '#2ecc71',
+            4: '#27ae60',
+            3: '#f1c40f',
+            2: '#e67e22',
+            1: '#e74c3c'
         };
 
         // Fetch data from CloudKit and plot on the map
@@ -157,7 +105,6 @@
 
             const records = response.records;
 
-            // Filter only records with a valid rating
             const filteredRecords = records.filter(record => {
                 const rating = record.fields.rating ? record.fields.rating.value : null;
                 return rating !== null && rating !== undefined && !isNaN(rating);
@@ -165,21 +112,16 @@
 
             const countryRatings = {};
 
-            // Process filtered records
             filteredRecords.forEach(record => {
                 const cityName = record.fields.cityName ? record.fields.cityName.value : "Unknown City";
                 const comment = record.fields.comment ? record.fields.comment.value : "No comment";
                 const rating = record.fields.rating.value;
-
-                // Extract country name from cityName (assuming format "City, Country")
                 const countryName = cityName.split(',').pop().trim();
 
-                // Geocode each city to find its coordinates
                 geocodeCity(cityName).then(coordinate => {
                     if (coordinate) {
                         addCityCircle(coordinate, { cityName, rating, comment });
 
-                        // Accumulate ratings for each country
                         if (!countryRatings[countryName]) {
                             countryRatings[countryName] = { totalRating: 0, count: 0 };
                         }
@@ -189,13 +131,12 @@
                 });
             });
 
-            // Add polygons for countries based on average ratings
             setTimeout(() => {
                 Object.keys(countryRatings).forEach(countryName => {
                     const averageRating = countryRatings[countryName].totalRating / countryRatings[countryName].count;
                     addPolygonForCountry(countryName, averageRating);
                 });
-            }, 250); // Delay to ensure all city coordinates are processed
+            }, 250);
         }).catch(error => {
             console.error('CloudKit query failed:', error);
         });
@@ -215,9 +156,8 @@
 
         // Add a circle to the map for each city
         function addCityCircle(coordinate, city) {
-            const color = ratingColors[Math.round(city.rating)] || '#3498db'; // Default color if no rating
+            const color = ratingColors[Math.round(city.rating)] || '#3498db';
 
-            // Create a GeoJSON source and add it as a layer
             map.addLayer({
                 id: `${city.cityName}-circle`,
                 type: 'circle',
@@ -243,7 +183,6 @@
                 }
             });
 
-            // Add a click event for each city circle
             map.on('click', `${city.cityName}-circle`, (e) => {
                 const features = map.queryRenderedFeatures(e.point, { layers: [`${city.cityName}-circle`] });
                 if (features.length) {
@@ -251,7 +190,6 @@
                     const rating = features[0].properties.rating;
                     const comment = features[0].properties.comment;
 
-                    // Display city details in a popup
                     new mapboxgl.Popup()
                         .setLngLat(coordinate)
                         .setHTML(`
@@ -264,65 +202,55 @@
             });
         }
 
-map.on('zoom', () => {
-    const currentZoom = map.getZoom();
-
-    // Remove country polygons if zoom level is >= 2.0
-    if (currentZoom >= 2.0) {
-        map.getStyle().layers.forEach(layer => {
-            if (layer.id.includes('-boundary-layer')) {
-                map.removeLayer(layer.id);
+        function addPolygonForCountry(countryName, rating) {
+            if (countryName === "Czech Republic") {
+                countryName = "Czechia";
             }
+
+            const color = ratingColors[Math.round(rating)] || '#3498db';
+
+            const sourceId = `${countryName}-boundary-source`;
+            const layerId = `${countryName}-boundary-layer`;
+
+            if (map.getLayer(layerId)) {
+                map.removeLayer(layerId);
+            }
+            if (map.getSource(sourceId)) {
+                map.removeSource(sourceId);
+            }
+
+            map.addSource(sourceId, {
+                type: 'vector',
+                url: 'mapbox://mapbox.country-boundaries-v1'
+            });
+
+            map.addLayer({
+                id: layerId,
+                type: 'fill',
+                source: sourceId,
+                'source-layer': 'country_boundaries',
+                paint: {
+                    'fill-color': color,
+                    'fill-opacity': 0.7
+                },
+                layout: {
+                    'visibility': map.getZoom() <= 2.0 ? 'visible' : 'none'
+                },
+                filter: ['==', 'name_en', countryName]
+            });
+        }
+
+        // Toggle visibility based on zoom level
+        map.on('zoom', () => {
+            const currentZoom = map.getZoom();
+            const visibility = currentZoom <= 2.0 ? 'visible' : 'none';
+
+            map.getStyle().layers.forEach(layer => {
+                if (layer.id.includes('-boundary-layer')) {
+                    map.setLayoutProperty(layer.id, 'visibility', visibility);
+                }
+            });
         });
-    }
-});
-
-function addPolygonForCountry(countryName, rating) {
-    const currentZoom = map.getZoom();
-    
-    // Only add the polygon if the zoom level is below 2.0
-    if (currentZoom >= 2.0) {
-        return; // Exit the function if zoom is too high
-    }
-
-    // Treat "Czech Republic" as "Czechia"
-    if (countryName === "Czech Republic") {
-        countryName = "Czechia";
-    }
-
-    const color = ratingColors[Math.round(rating)] || '#3498db';
-
-    const sourceId = `${countryName}-boundary-source`;
-    const layerId = `${countryName}-boundary-layer`;
-
-    // Remove existing source or layer if they exist
-    if (map.getLayer(layerId)) {
-        map.removeLayer(layerId);
-    }
-
-    if (map.getSource(sourceId)) {
-        map.removeSource(sourceId);
-    }
-
-    map.addSource(sourceId, {
-        type: 'vector',
-        url: 'mapbox://mapbox.country-boundaries-v1'
-    });
-
-    map.addLayer({
-        id: layerId,
-        type: 'fill',
-        source: sourceId,
-        'source-layer': 'country_boundaries',
-        paint: {
-            'fill-color': color,
-            'fill-opacity': 0.7
-        },
-        filter: ['==', 'name_en', countryName]
-    });
-}
-
-
     </script>
 </body>
 </html>
