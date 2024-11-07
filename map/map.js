@@ -14,7 +14,7 @@ const map = new mapboxgl.Map({
     style: 'mapbox://styles/mapbox/streets-v11',
     center: [0, 0],
     zoom: 2,
-    projection: 'globe' // Set the map projection to a globe
+    projection: 'globe'
 });
 
 // Define color codes based on rating for country polygons
@@ -28,6 +28,7 @@ const countryRatingColors = {
 
 // Apply atmosphere settings
 map.on('style.load', () => {
+    console.log("Map style loaded");  // Confirm style load
     map.setFog({
         color: 'rgba(135, 206, 235, 0.5)',
         "high-color": 'rgba(70, 130, 180, 0.8)',
@@ -39,11 +40,13 @@ map.on('style.load', () => {
     map.setMinZoom(1.0);
     map.setMaxZoom(11.0);
 
+    // Fetch and add polygons after style load
     fetchCountryRatings();
 });
 
 // Fetch country data and add polygons based on average rating
 function fetchCountryRatings() {
+    console.log("Fetching country ratings from CloudKit");
     CloudKit.getDefaultContainer().publicCloudDatabase.performQuery({
         recordType: 'CityComment'
     }).then(response => {
@@ -65,6 +68,7 @@ function fetchCountryRatings() {
 
         Object.keys(countryRatings).forEach(country => {
             const avgRating = calculateAverage(countryRatings[country]);
+            console.log(`Adding polygon for ${country} with average rating ${avgRating}`);
             addCountryPolygon(country, avgRating);
         });
     }).catch(error => console.error('CloudKit query failed:', error));
@@ -88,17 +92,26 @@ function addCountryPolygon(country, rating) {
     if (map.getSource(sourceId)) map.removeSource(sourceId);
     if (map.getLayer(layerId)) map.removeLayer(layerId);
 
+    // Add the country boundaries vector source
     map.addSource(sourceId, {
         type: 'vector',
         url: 'mapbox://mapbox.country-boundaries-v1'
     });
 
+    // Log after source addition
+    if (map.getSource(sourceId)) {
+        console.log(`Source added for ${country} with sourceId ${sourceId}`);
+    } else {
+        console.error(`Failed to add source for ${country}`);
+    }
+
+    // Attempt to add the polygon layer for the country
     try {
         map.addLayer({
             id: layerId,
             type: 'fill',
             source: sourceId,
-            'source-layer': 'country_boundaries',
+            'source-layer': 'country_boundaries',  // Verify this matches the exact name in Mapbox Studio
             paint: {
                 'fill-color': color,
                 'fill-opacity': 0.5
@@ -109,15 +122,3 @@ function addCountryPolygon(country, rating) {
         console.error(`Error adding polygon layer for ${country}:`, error);
     }
 }
-
-// Toggle visibility based on zoom level
-map.on('zoom', () => {
-    const zoom = map.getZoom();
-    const isVisible = zoom < 4 ? 'visible' : 'none';
-
-    Object.keys(map.getStyle().sources).forEach(sourceId => {
-        if (sourceId.includes("-boundary-source")) {
-            map.setLayoutProperty(sourceId.replace("-source", "-layer"), 'visibility', isVisible);
-        }
-    });
-});
