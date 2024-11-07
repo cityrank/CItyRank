@@ -26,12 +26,15 @@ const countryRatingColors = {
     1: '#e74c3c'
 };
 
+// Load Mapbox Style and Initialize Fog, Bounds
 map.on('style.load', () => {
-    console.log("Map loaded");  // Debug check if Mapbox style loads
+    console.log("Map loaded");
+
+    // Set atmosphere and fog
     map.setFog({
-        color: 'rgba(135, 206, 235, 0.5)', // Light sky blue near horizon
-        "high-color": 'rgba(70, 130, 180, 0.8)', // Soft blue higher in the atmosphere
-        "space-color": 'rgba(20, 24, 82, 1.0)', // Deep navy for space
+        color: 'rgba(135, 206, 235, 0.5)',
+        "high-color": 'rgba(70, 130, 180, 0.8)',
+        "space-color": 'rgba(20, 24, 82, 1.0)',
         "horizon-blend": 0.1,
         "star-intensity": 0.1
     });
@@ -39,6 +42,7 @@ map.on('style.load', () => {
     map.setMinZoom(1.0);
     map.setMaxZoom(11.0);
 
+    // Fetch country ratings
     fetchCountryRatings();
 });
 
@@ -68,7 +72,7 @@ function fetchCountryRatings() {
 
         Object.keys(countryRatings).forEach(country => {
             const avgRating = calculateAverage(countryRatings[country]);
-            console.log(`Attempting to add polygon for ${country} with average rating ${avgRating}`);
+            console.log(`Adding polygon for ${country} with average rating ${avgRating}`);
             addCountryPolygon(country, avgRating);
         });
     }).catch(error => console.error('CloudKit query failed:', error));
@@ -90,11 +94,9 @@ function addCountryPolygon(country, rating) {
 
     // Remove existing source and layer if they exist
     if (map.getSource(sourceId)) {
-        console.log(`Removing existing source for ${country}`);
         map.removeSource(sourceId);
     }
     if (map.getLayer(layerId)) {
-        console.log(`Removing existing layer for ${country}`);
         map.removeLayer(layerId);
     }
 
@@ -104,12 +106,12 @@ function addCountryPolygon(country, rating) {
         url: 'mapbox://mapbox.country-boundaries-v1'
     });
 
-    // Verify source addition
-    if (map.getSource(sourceId)) {
-        console.log(`Source added for ${country}`);
-    } else {
-        console.error(`Failed to add source for ${country}`);
+    // Check if source was added successfully
+    if (!map.getSource(sourceId)) {
+        console.error(`Source ${sourceId} could not be added for country ${country}`);
+        return;
     }
+    console.log(`Source added for ${country}`);
 
     // Add a new layer for the country polygon
     map.addLayer({
@@ -124,7 +126,7 @@ function addCountryPolygon(country, rating) {
         }
     });
 
-    // Verify layer addition
+    // Confirm if the layer was successfully added
     if (map.getLayer(layerId)) {
         console.log(`Polygon layer added for ${country}`);
     } else {
@@ -135,11 +137,11 @@ function addCountryPolygon(country, rating) {
 // Toggle visibility based on zoom level
 map.on('zoom', () => {
     const zoom = map.getZoom();
-    const isVisible = zoom < 4 ? 'visible' : 'none';
+    const visibility = zoom < 4 ? 'visible' : 'none';
 
     map.getStyle().layers.forEach(layer => {
         if (layer.id.includes('-layer')) {
-            map.setLayoutProperty(layer.id, 'visibility', isVisible);
+            map.setLayoutProperty(layer.id, 'visibility', visibility);
         }
     });
 });
