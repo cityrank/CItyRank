@@ -13,11 +13,13 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3  # Updated to v3
 
-      - name: Replace Mapbox token
-        run: |
-          sed -i 's|{{MAPBOX}}|'"$MAPBOX"'|g' map/index.html
-        env:
-          MAPBOX: ${{ secrets.MAPBOX }}
+- name: Replace Mapbox token
+  run: |
+    sed -i 's|{{MAPBOX}}|'"$MAPBOX"'|g' map/index.html
+    cat map/index.html # Print the updated file for debugging
+  env:
+    MAPBOX: ${{ secrets.MAPBOX }}
+
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4  # Updated to v4
