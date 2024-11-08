@@ -15,9 +15,13 @@ jobs:
 
       - name: Replace Mapbox token
         run: |
+          # Confirm file structure and replace token
+          echo "Replacing Mapbox token in index.html file"
           sed -i 's|{{MAPBOX}}|'"$MAPBOX"'|g' ./map/index.html
-          echo "Replaced MAPBOX token in index.html:"
-          cat ./map/index.html # Print the updated file for debugging to ensure token replacement occurred
+          
+          # Print the contents to verify replacement
+          echo "Contents of index.html after replacement:"
+          cat ./map/index.html
         env:
           MAPBOX: ${{ secrets.MAPBOX }}
 
@@ -25,4 +29,4 @@ jobs:
         uses: peaceiris/actions-gh-pages@v4  # Updated to v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./map  # Specify the directory to publish
+          publish_dir: ./map  # Directory to publish
