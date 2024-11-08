@@ -3,7 +3,7 @@ name: Deploy to GitHub Pages
 on:
   push:
     branches:
-      - main  # or your deployment branch
+      - main
 
 jobs:
   deploy:
@@ -15,7 +15,7 @@ jobs:
 
       - name: Replace Mapbox token
         run: |
-sed -i 's|{{MAPBOX}}|'"$MAPBOX"'|g' map/index.html
+          sed -i 's|{{MAPBOX}}|'"$MAPBOX"'|g' map/index.html
         env:
           MAPBOX: ${{ secrets.MAPBOX }}
 
@@ -23,4 +23,4 @@ sed -i 's|{{MAPBOX}}|'"$MAPBOX"'|g' map/index.html
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./
+          publish_dir: ./map
