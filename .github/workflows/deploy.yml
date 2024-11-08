@@ -11,22 +11,19 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3  # Updated to v3
+        uses: actions/checkout@v3
 
       - name: Replace Mapbox token
         run: |
-          # Confirm file structure and replace token
-          echo "Replacing Mapbox token in index.html file"
-          sed -i 's|{{MAPBOX}}|'"$MAPBOX"'|g' map/index.html
-          
-          # Print the contents to verify replacement
-          echo "Contents of index.html after replacement:"
-          cat map/index.html
+          sed -i 's|{{MAPBOX}}|'"$MAPBOX"'|g' ./map/index.html
+          mv ./map/index.html ./map/home.html # Rename for cache refresh
+          echo "Contents after replacement and renaming:"
+          cat ./map/home.html
         env:
           MAPBOX: ${{ secrets.MAPBOX }}
 
       - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v4  # Updated to v4
+        uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: map  # Directory to publish
+          publish_dir: ./map
