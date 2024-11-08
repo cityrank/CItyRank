@@ -13,22 +13,19 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Confirm file structure and replace token
+      - name: List files for troubleshooting
+        run: ls -R  # Lists all files to confirm file paths
+
+      - name: Replace Mapbox token
         run: |
-          echo "Replacing Mapbox token in index.html file"
-          # Use envsubst to replace {{MAPBOX}} with the actual token in index.html
-          export MAPBOX=${{ secrets.MAPBOX }}
-          envsubst '${MAPBOX}' < ./map/index.html > ./map/home.html
-          echo "Contents of home.html after replacement:"
-          cat ./map/home.html
+          echo "Replacing Mapbox token in home.html file"
+          sed -i 's|{{MAPBOX}}|'"$MAPBOX"'|g' ./map/home.html
+          cat ./map/home.html  # Print the updated file for debugging
+        env:
+          MAPBOX: ${{ secrets.MAPBOX }}
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./map
-          publish_branch: gh-pages
-          allow_empty_commit: false
-          keep_files: false
-          enable_jekyll: false
-          exclude_assets: .github
