@@ -43,7 +43,7 @@ CloudKit.configure({
 
 // Initialize Mapbox
 mapboxgl.accessToken = '{{MAPBOX}}';
-console.log("Mapbox Token:", mapboxgl.accessToken); // Add this line to verify
+console.log("Mapbox Token in production:", mapboxgl.accessToken);
 const map = new mapboxgl.Map({
     container: 'map',
     style: 'mapbox://styles/mapbox/streets-v11',
