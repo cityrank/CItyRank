@@ -16,7 +16,8 @@ jobs:
       - name: Replace Mapbox token
         run: |
           sed -i 's|{{MAPBOX}}|'"$MAPBOX"'|g' ./map/index.html
-          cat ./map/index.html # Print the updated file for debugging
+          echo "Replaced MAPBOX token in index.html:"
+          cat ./map/index.html # Print the updated file for debugging to ensure token replacement occurred
         env:
           MAPBOX: ${{ secrets.MAPBOX }}
 
