@@ -1,1 +1,26 @@
+name: Deploy to GitHub Pages
 
+on:
+  push:
+    branches:
+      - main  # or your deployment branch
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3  # Updated to latest version
+
+      - name: Replace Mapbox token
+        run: |
+          sed -i 's|{{MAPBOX}}|'"$MAPBOX"'|g' map/index.html
+        env:
+          MAPBOX: ${{ secrets.MAPBOX }}
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4  # Updated to latest version
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./map
