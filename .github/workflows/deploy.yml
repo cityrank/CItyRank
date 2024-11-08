@@ -11,7 +11,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3  # Updated to latest version
+        uses: actions/checkout@v2
 
       - name: Replace Mapbox token
         run: |
@@ -19,8 +19,14 @@ jobs:
         env:
           MAPBOX: ${{ secrets.MAPBOX }}
 
+      - name: Verify Mapbox token replacement
+        run: |
+          echo "Checking for Mapbox token replacement in index.html..."
+          grep 'accessToken' map/index.html || echo "No accessToken found in map/index.html"
+          cat map/index.html | grep 'accessToken'
+
       - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v4  # Updated to latest version
+        uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./map
