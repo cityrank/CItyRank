@@ -1,6 +1,6 @@
-// Encoded tokens (ensure these are the correct Base64-encoded values)
+// Encoded tokens (encoded as Base64)
 const encodedCloudKitToken = 'NTk4ZDUyODc2OGZlYzM1YWUxMDQxN2QzMzEzZmQ0YWU2ZmM2YzY1OTA3YTJlMmU3YmY4ODQ5MWYwZWZmOWQwYQ==';
-const encodedMapboxToken = 'cGsucnlramlhYXBwa29rYQ==';  // Replace with correct encoded Mapbox token
+const encodedMapboxToken = 'cGsuaWlraXRrbzEiLCJhIjoiY20wemJxaDVzMDVheDJqczg0NnV3MG1jbyJ9.8MNS07csgIJkUXTGjZiaYA=='; // New encoded value
 
 // Decoding function
 function decodeToken(encodedToken) {
@@ -17,9 +17,6 @@ function initializeServices() {
     try {
         const cloudKitToken = decodeToken(encodedCloudKitToken);
         const mapboxToken = decodeToken(encodedMapboxToken);
-
-        console.log("Decoded CloudKit Token:", cloudKitToken);
-        console.log("Decoded Mapbox Token:", mapboxToken);
 
         // Initialize CloudKit
         CloudKit.configure({
@@ -40,12 +37,22 @@ function initializeServices() {
             projection: 'globe'
         });
 
-        // Add controls to map
-        map.addControl(new mapboxgl.NavigationControl());
+        // Expose map variable to global scope for `addControl`
+        window.map = map;
+
+        // Add controls
+        const navControl = new mapboxgl.NavigationControl();
+        map.addControl(navControl, 'top-right');
+
+        const geoLocateControl = new mapboxgl.GeolocateControl({
+            positionOptions: { enableHighAccuracy: true },
+            trackUserLocation: true,
+            showUserHeading: true
+        });
+        map.addControl(geoLocateControl, 'top-left');
     } catch (error) {
         console.error("Error initializing services:", error);
     }
 }
 
-// Export the initialization function for use in HTML
 export { initializeServices };
