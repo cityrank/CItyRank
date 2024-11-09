@@ -1,4 +1,4 @@
-name: Deploy to GitHub Pages
+name: deploy
 
 on:
   push:
@@ -10,30 +10,22 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # Checkout the repository
-      - name: Check out the repository
-        uses: actions/checkout@v3
+    - name: Check out the repository
+      uses: actions/checkout@v3
 
-      # Replace placeholders in home.html with secrets
-      - name: Replace tokens in home.html
-        env:
-          MAPBOX: ${{ secrets.MAPBOX }}
-          APPLE: ${{ secrets.APPLE }}
-        run: |
-          echo "Replacing Mapbox token in home.html file"
-          sed -i "s|{{MAPBOX}}|$MAPBOX|g" ./map/home.html
-          echo "Replacing CloudKit token in home.html file"
-          sed -i "s|{{APPLE}}|$APPLE|g" ./map/home.html
+    - name: Replace tokens in home.html
+      run: |
+        echo "Replacing Mapbox and CloudKit tokens in home.html"
+        sed -i "s|{{MAPBOX}}|$MAPBOX|g" ./map/home.html
+        sed -i "s|{{APPLE}}|$APPLE|g" ./map/home.html
+      env:
+        MAPBOX: ${{ secrets.MAPBOX }}
+        APPLE: ${{ secrets.APPLE }}
 
-          # Debug: Print part of the updated file to ensure token replacement
-          echo "Preview of home.html with tokens replaced:"
-          head -n 20 ./map/home.html
-
-      # Deploy to GitHub Pages
-      - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v4
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./map
-          publish_branch: gh-pages
-          exclude_assets: .github
+    - name: Deploy to GitHub Pages
+      uses: peaceiris/actions-gh-pages@v4
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ./map
+        publish_branch: gh-pages
+        exclude_assets: .github
