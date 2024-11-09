@@ -32,18 +32,7 @@
             }]
         });
 
-const cloudKitToken = cloudKitTokenParts.join('');
-
-CloudKit.configure({
-    containers: [{
-        containerIdentifier: 'iCloud.com.mikita.mapapp',
-        apiTokenAuth: { apiToken: cloudKitToken, persist: true },
-        environment: 'production'
-    }]
-});
-
-
-     // Initialize Mapbox
+        // Initialize Mapbox
         mapboxgl.accessToken = 'pk.eyJ1IjoibWlraXRrbzEiLCJhIjoiY20wemJxaDVzMDVheDJqczg0NnV3MG1jbyJ9.8MNS07csgIJkUXTGjZiaYA';
         const map = new mapboxgl.Map({
             container: 'map',
