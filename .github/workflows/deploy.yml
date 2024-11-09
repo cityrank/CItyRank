@@ -10,28 +10,22 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
+    - name: Check out the repository
+      uses: actions/checkout@v3
 
-      - name: Replace Mapbox and CloudKit tokens in home.html file
-        run: |
-          echo "Replacing Mapbox token in home.html file"
-          sed -i "s|{{MAPBOX}}|$MAPBOX|g" ./map/home.html
-          echo "Replacing CloudKit token in home.html file"
-          sed -i "s|{{APPLE}}|$APPLE|g" ./map/home.html
+    - name: Replace Mapbox and CloudKit tokens in home.html
+      run: |
+        sed -i "s|{{MAPBOX}}|$MAPBOX|g" ./map/home.html
+        sed -i "s|{{APPLE}}|$APPLE|g" ./map/home.html
+        echo "Preview of replaced tokens in home.html:"
+        head -n 20 ./map/home.html
+      env:
+        MAPBOX: ${{ secrets.MAPBOX_TOKEN }}
+        APPLE: ${{ secrets.CLOUDKIT_TOKEN }}
 
-          # Debug: Output part of home.html to ensure replacement was successful
-          echo "Preview of home.html with tokens replaced:"
-          cat ./map/home.html | head -n 30
-
-        env:
-          MAPBOX: ${{ secrets.MAPBOX }}
-          APPLE: ${{ secrets.APPLE }}
-
-      - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v4
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./map
-          publish_branch: gh-pages
-          exclude_assets: .github
+    - name: Deploy to GitHub Pages
+      uses: peaceiris/actions-gh-pages@v4
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ./map
+        publish_branch: gh-pages
