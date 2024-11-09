@@ -37,22 +37,33 @@ function initializeServices() {
             projection: 'globe'
         });
 
-        // Expose map variable to global scope for `addControl`
-        window.map = map;
-
-        // Add controls
-        const navControl = new mapboxgl.NavigationControl();
-        map.addControl(navControl, 'top-right');
-
-        const geoLocateControl = new mapboxgl.GeolocateControl({
+        // Add Navigation and Geolocation Controls
+        map.addControl(new mapboxgl.NavigationControl(), 'top-right');
+        map.addControl(new mapboxgl.GeolocateControl({
             positionOptions: { enableHighAccuracy: true },
             trackUserLocation: true,
             showUserHeading: true
+        }), 'top-left');
+
+        // Add Map Style and Layer Adjustments
+        map.on('style.load', () => {
+            map.setFog({
+                color: 'rgba(135, 206, 235, 0.5)',
+                "high-color": 'rgba(70, 130, 180, 0.8)',
+                "space-color": 'rgba(20, 24, 82, 1.0)',
+                "horizon-blend": 0.1,
+                "star-intensity": 0.1
+            });
+            map.setMinZoom(2.0);
+            map.setMaxZoom(11.0);
         });
-        map.addControl(geoLocateControl, 'top-left');
+
+        // Further functions to add city circles, polygons, etc., can go here
+
     } catch (error) {
         console.error("Error initializing services:", error);
     }
 }
 
-export { initializeServices };
+// Call initializeServices once the file is loaded
+initializeServices();
