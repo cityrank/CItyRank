@@ -24,13 +24,13 @@
     <div id="map"></div>
     <script>
         // Initialize CloudKit
-CloudKit.configure({
-    containers: [{
-        containerIdentifier: 'iCloud.com.mikita.mapapp',
-        apiTokenAuth: { apiToken: '{{APPLE}}', persist: true },
-        environment: 'production'
-    }]
-});
+        CloudKit.configure({
+            containers: [{
+                containerIdentifier: 'iCloud.com.mikita.mapapp',
+                apiTokenAuth: { apiToken: '{{APPLE}}', persist: true },
+                environment: 'production'
+            }]
+        });
 
 
         // Initialize Mapbox
