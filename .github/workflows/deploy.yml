@@ -20,14 +20,14 @@ jobs:
       env:
         MAPBOX: ${{ secrets.MAPBOX_TOKEN }}
         APPLE: ${{ secrets.CLOUDKIT_TOKEN }}
-      
+
     - name: Verify content in map directory
       run: ls -R ./map
 
     - name: Deploy to GitHub Pages
-      uses: peaceiris/actions-gh-pages@v4
-      with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: ./map
-        publish_branch: main
-        exclude_assets: .github
+      run: |
+        git config user.name "GitHub Actions"
+        git config user.email "actions@github.com"
+        git add map/home.html
+        git commit -m "Deploy updated home.html with tokens"
+        git push origin main
