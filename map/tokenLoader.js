@@ -1,6 +1,6 @@
 // Encoded tokens (encoded as Base64)
 const encodedCloudKitToken = 'NTk4ZDUyODc2OGZlYzM1YWUxMDQxN2QzMzEzZmQ0YWU2ZmM2YzY1OTA3YTJlMmU3YmY4ODQ5MWYwZWZmOWQwYQ==';
-const encodedMapboxToken = 'cGsuaWlraXRrbzEiLCJhIjoiY20wemJxaDVzMDVheDJqczg0NnV3MG1jbyJ9.8MNS07csgIJkUXTGjZiaYA=='; // New encoded value
+const encodedMapboxToken = 'cGsuZXlKMUlqb2liV2xyYVhScmJ6RWlMQ0poSWpvaVkyMHdlbUp4YURWek1EVmhlREpxY3pnME5uVjNNRzFqYnlKOS44TU5TMDdjc2dJSmtVWFRHalppYVlB'; // New encoded value
 
 // Decoding function
 function decodeToken(encodedToken) {
