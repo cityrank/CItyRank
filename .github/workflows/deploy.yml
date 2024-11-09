@@ -3,29 +3,26 @@ name: Deploy to GitHub Pages
 on:
   push:
     branches:
-      - main
+      - main  # Update to your preferred branch
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Check out the repository
-      uses: actions/checkout@v3
+      - name: Checkout repository
+        uses: actions/checkout@v3
 
-    - name: Replace Mapbox and CloudKit tokens in home.html
-      run: |
-        sed -i "s|{{MAPBOX}}|$MAPBOX|g" ./map/home.html
-        sed -i "s|{{APPLE}}|$APPLE|g" ./map/home.html
-        echo "Preview of replaced tokens in home.html:"
-        head -n 20 ./map/home.html
-      env:
-        MAPBOX: ${{ secrets.MAPBOX_TOKEN }}
-        APPLE: ${{ secrets.CLOUDKIT_TOKEN }}
+      - name: Replace tokens in home.html
+        run: |
+          sed -i 's|{{MAPBOX}}|'"$MAPBOX"'|g' map/home.html
+          sed -i 's|{{APPLE}}|'"$CLOUDKIT_TOKEN"'|g' map/home.html
+        env:
+          MAPBOX: ${{ secrets.MAPBOX_TOKEN }}
+          CLOUDKIT_TOKEN: ${{ secrets.CLOUDKIT_TOKEN }}
 
-    - name: Deploy to GitHub Pages
-      uses: peaceiris/actions-gh-pages@v4
-      with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: ./map
-        publish_branch: gh-pages
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./map
