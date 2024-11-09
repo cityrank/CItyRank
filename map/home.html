@@ -28,11 +28,7 @@
     <script type="module">
         import { initializeServices } from './tokenLoader.js';
 
-        // Initialize services and get the map instance
-        const map = initializeServices();
-
-        // Add controls and configure settings once map is initialized
-        map.on('load', () => {
+        initializeServices().then(map => {
         const navControl = new mapboxgl.NavigationControl();
         map.addControl(navControl, 'top-right'); // Position the navigation control at the top-right corner
 
