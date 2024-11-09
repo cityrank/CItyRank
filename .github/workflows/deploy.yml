@@ -24,9 +24,10 @@ jobs:
           sed -i "s|{{MAPBOX}}|$MAPBOX|g" ./map/home.html
           echo "Replacing CloudKit token in home.html file"
           sed -i "s|{{APPLE}}|$APPLE|g" ./map/home.html
-          
-          # Display the updated file for verification
-          cat ./map/home.html
+
+          # Debug: Print part of the updated file to ensure token replacement
+          echo "Preview of home.html with tokens replaced:"
+          head -n 20 ./map/home.html
 
       # Deploy to GitHub Pages
       - name: Deploy to GitHub Pages
