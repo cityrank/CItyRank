@@ -109,15 +109,9 @@
                     }
                 });
 
-                map.getStyle().layers.forEach(layer => {
-                    const layerId = layer.id.toLowerCase();
-                    if (layerId.includes('water')) {
-                        if (layer.type === 'fill') {
-                            map.setPaintProperty(layer.id, 'fill-color', '#d3d3d3');
-                        } else if (layer.type === 'line') {
-                            map.setPaintProperty(layer.id, 'line-color', '#A9A9A9');
-                        }
-                    }
+            map.getStyle().layers.forEach(layer => {
+                const layerId = layer.id.toLowerCase();
+                if (layerId.includes('water')) {
                     if (layer.type === 'fill') {
                         map.setPaintProperty(layer.id, 'fill-color', '#d3d3d3');
                     } else if (layer.type === 'line') {
