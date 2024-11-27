@@ -42,11 +42,17 @@
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
         }
 
-        .logo {
-            width: 120px;
-            margin: 0 auto 20px;
-            display: block;
-        }
+.logo {
+    width: 140px; /* Slightly larger for emphasis */
+    margin: 0 auto 20px; /* Center aligned with spacing below */
+    display: block; /* Ensure it's treated as a block element */
+    border-radius: 10px; /* Smooth, subtle rounding */
+    overflow: hidden; /* Ensures no content overflows */
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); /* Soft shadow for depth */
+    background-color: #ffffff; /* Ensure background contrast */
+    border: 2px solid #f0f0f0; /* Subtle border to enhance separation */
+}
+
 
         h1 {
             font-family: 'Lora', serif;
@@ -148,11 +154,7 @@
 <body>
     <div class="container">
 
-        <div class="download-section">
-            <a href="https://apps.apple.com/app/cityrank/id6737245374">
-                <img src="https://developer.apple.com/assets/elements/badges/download-on-the-app-store.svg" alt="Download on the App Store">
-            </a>
-        </div>
+
         
         <img src="logo.png" alt="CityRank Logo" class="logo">
 
@@ -171,6 +173,12 @@
             <li><strong>Profile & Notifications:</strong> Track reviews and customize your profile.</li>
             <li><strong>Leaderboards:</strong> See where you stand globally and locally.</li>
         </ul>
+
+                <div class="download-section">
+            <a href="https://apps.apple.com/app/cityrank/id6737245374">
+                <img src="https://developer.apple.com/assets/elements/badges/download-on-the-app-store.svg" alt="Download on the App Store">
+            </a>
+        </div>
 
         <div class="screenshots">
             <img src="img/1.png" alt="Screenshot 1">
