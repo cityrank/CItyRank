@@ -31,7 +31,7 @@
         }
 
         .container {
-            max-width: 800px;
+            max-width: 900px;
             margin: 20px auto;
             padding: 20px;
             background-color: #ffffff;
@@ -77,46 +77,18 @@
             line-height: 1.4;
         }
 
-        .slider-container {
-            position: relative;
-            overflow: hidden;
-            margin: 20px 0;
-            border-radius: 10px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-        }
-
-        .slider {
+        .screenshots {
             display: flex;
-            transition: transform 0.5s ease-in-out;
-            width: 500%;
-        }
-
-        .slider img {
-            width: 100%;
-            max-height: 400px;
-            object-fit: cover;
-            flex-shrink: 0;
-        }
-
-        .slider-controls {
-            display: flex;
-            justify-content: center;
             gap: 10px;
-            margin-top: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin: 20px 0;
         }
 
-        .slider-controls button {
-            background-color: #FF6F61;
-            color: #fff;
-            border: none;
-            padding: 10px 15px;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
-
-        .slider-controls button:hover {
-            background-color: #e65b50;
+        .screenshots img {
+            max-width: 180px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
         }
 
         .download-section {
@@ -126,6 +98,18 @@
         .download-section a img {
             height: 54px;
             filter: drop-shadow(0px 4px 10px rgba(0, 0, 0, 0.2));
+        }
+
+        .additional-links {
+            margin: 20px 0;
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .additional-links a img {
+            height: 54px;
         }
 
         nav {
@@ -148,11 +132,8 @@
             h1 {
                 font-size: 2em;
             }
-            .slider img {
-                max-height: 250px;
-            }
-            .slider-controls button {
-                padding: 8px 10px;
+            .screenshots img {
+                max-width: 100px;
             }
         }
     </style>
@@ -173,19 +154,12 @@
             <li><strong>Leaderboards:</strong> See where you stand globally and locally.</li>
         </ul>
 
-        <div class="slider-container">
-            <div class="slider" id="slider">
-                <img src="img/1.png" alt="Screenshot 1">
-                <img src="img/2.png" alt="Screenshot 2">
-                <img src="img/3.png" alt="Screenshot 3">
-                <img src="img/4.png" alt="Screenshot 4">
-                <img src="img/5.png" alt="Screenshot 5">
-            </div>
-        </div>
-
-        <div class="slider-controls">
-            <button onclick="moveSlider(-1)">Previous</button>
-            <button onclick="moveSlider(1)">Next</button>
+        <div class="screenshots">
+            <img src="img/1.png" alt="Screenshot 1">
+            <img src="img/2.png" alt="Screenshot 2">
+            <img src="img/3.png" alt="Screenshot 3">
+            <img src="img/4.png" alt="Screenshot 4">
+            <img src="img/5.png" alt="Screenshot 5">
         </div>
 
         <div class="download-section">
@@ -194,22 +168,22 @@
             </a>
         </div>
 
+        <div class="additional-links">
+            <a href="https://www.producthunt.com/posts/cityrank?embed=true&utm_source=badge-featured&utm_medium=badge&utm_souce=badge-cityrank" target="_blank">
+                <img src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=589103&theme=light" alt="Product Hunt">
+            </a>
+            <a href="https://fazier.com/launches/cityrank" target="_blank" rel="noopener noreferrer">
+                <img src="https://fazier.com/api/v1/public/badges/embed_image.svg?launch_id=1854&badge_type=daily&theme=light" alt="Fazier Badge">
+            </a>
+            <a href="https://startupfa.me/categories/travel-geography?ref=apps.apple.com" target="_blank">
+                <img src="https://startupfa.me/badges/featured.webp" alt="Startup Fame">
+            </a>
+        </div>
+
         <nav>
             <a href="terms.html">Terms of Use</a> | 
             <a href="privacy.html">Privacy Policy</a>
         </nav>
     </div>
-
-    <script>
-        let currentSlide = 0;
-
-        function moveSlider(direction) {
-            const slider = document.getElementById('slider');
-            const totalSlides = slider.children.length;
-
-            currentSlide = (currentSlide + direction + totalSlides) % totalSlides;
-            slider.style.transform = `translateX(-${currentSlide * 100}%)`;
-        }
-    </script>
 </body>
 </html>
