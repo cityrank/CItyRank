@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Achievements</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; padding: 50px; }
+    </style>
+</head>
+<body>
+    <h1>Opening CityRank Special Event...</h1>
+    <p>If you are not redirected, <a id="appLink" href="cityrank://achievements">click here</a>.</p>
+    <p>If the app is not installed, <a id="storeLink" href="https://apps.apple.com/us/app/cityrank/id6737245374">download it here</a>.</p>
+    
+    <script type="text/javascript">
+        // Attempt to open the custom URL scheme
+        var appLink = document.getElementById('appLink').href;
+        window.location.href = appLink;
+
+        // Set a timer to redirect to the App Store if the app doesn't open
+        setTimeout(function(){
+            var storeLink = document.getElementById('storeLink').href;
+            window.location.href = storeLink;
+        }, 1500);  // Slightly increased timeout to allow for app opening
+    </script>
+</body>
+</html>
